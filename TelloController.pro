@@ -9,13 +9,13 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    udp_controller.cpp
+    ./src/main.cpp \
+    ./src/mainwindow.cpp \
+    ./src/udp_controller.cpp
 
 HEADERS += \
-    mainwindow.h \
-    udp_controller.h
+    ./include/mainwindow.h \
+    ./include/udp_controller.h
 
 FORMS += \
     mainwindow.ui
