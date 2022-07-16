@@ -14,9 +14,9 @@ FaceDetector::FaceDetector(QObject *parent)
     classifier.load(cascades_path.toStdString().c_str());
 }
 
-void FaceDetector::detect(cv::Mat& src)
+void FaceDetector::detect(cv::Mat src)
 {
-    if (!enabled)
+    if (src.empty() || !enabled)
         return;
 
     std::vector<cv::Rect> faces = {};
@@ -26,5 +26,5 @@ void FaceDetector::detect(cv::Mat& src)
         cv::rectangle(src, faces[i].tl(), faces[i].br(), cv::Scalar(50, 50, 255), 3);
     }
 
-    emit face_frame(src);
+    emit faceframe(src);
 }

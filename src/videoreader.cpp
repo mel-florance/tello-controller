@@ -23,4 +23,3 @@ void VideoReader::process()
         emit decoded_frame(decoded);
     }
 }
-

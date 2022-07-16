@@ -21,10 +21,10 @@ public:
     int min_neighbors;
 
 signals:
-    void face_frame(cv::Mat& matrix);
+    void faceframe(cv::Mat matrix);
 
 public slots:
-    void detect(cv::Mat& src);
+    void detect(cv::Mat src);
 
 private:
     cv::Mat matrix;

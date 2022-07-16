@@ -2,7 +2,7 @@
 
 EdgeDetector::EdgeDetector(QObject *parent)
     : QObject{parent},
-    enabled(false),
+    enabled(true),
     ratio(3),
     min_threshold(20),
     kernel_size(3)

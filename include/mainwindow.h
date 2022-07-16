@@ -44,9 +44,6 @@ private slots:
     void on_button_rotate_right_clicked();
     void on_button_rotate_left_clicked();
 
-    void on_groupBox_edge_detection_clicked(bool checked);
-    void on_groupBox_face_detection_clicked(bool checked);
-
     void on_slider_edge_threshold_ratio_valueChanged(int value);
     void on_slider_edge_min_threshold_valueChanged(int value);
     void on_slider_face_min_neighbors_valueChanged(int value);
@@ -66,6 +63,12 @@ private slots:
 
     void on_pollinfos();
     void on_videoframe(cv::Mat matrix);
+
+    void on_groupBox_video_effects_clicked(bool checked);
+
+    void on_edge_detection_radio_clicked();
+
+    void on_face_detection_radio_clicked();
 
 protected:
      void keyPressEvent(QKeyEvent *event) override;

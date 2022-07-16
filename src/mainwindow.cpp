@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->button_takeoff->setDisabled(true);
     ui->button_emergency->setDisabled(true);
     ui->button_start_video->setDisabled(true);
+    ui->groupBox_video_effects->setDisabled(true);
     enable_flight_controls(false);
 
     QPixmap pxr(960, 720);
@@ -264,6 +265,7 @@ void MainWindow::on_button_start_video_clicked()
             controller->add_command("streamoff");
             controller->flush();
             ui->button_start_video->setText("Start video");
+            ui->groupBox_video_effects->setDisabled(true);
             video_reader_thread->terminate();
             QPixmap pxr(ui->video->width(), ui->video->height());
             pxr.fill(Qt::black);
@@ -273,19 +275,27 @@ void MainWindow::on_button_start_video_clicked()
             controller->add_command("streamon");
             controller->flush();
             ui->button_start_video->setText("Stop video");
+            ui->groupBox_video_effects->setDisabled(false);
 
             video_reader_thread = new QThread();
             video_reader = new VideoReader();
             video_reader->moveToThread(video_reader_thread);
             connect(video_reader_thread, &QThread::started, video_reader, &VideoReader::process);
-            // connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
             connect(video_reader_thread, &QThread::finished, video_reader_thread, &QThread::deleteLater);
             video_reader_thread->start();
+
+            face_detector_thread = new QThread();
+            face_detector = new FaceDetector();
+            connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), face_detector, SLOT(detect(cv::Mat)));
+            //connect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            face_detector->moveToThread(face_detector_thread);
+            face_detector_thread->start();
 
             edge_detector_thread = new QThread();
             edge_detector = new EdgeDetector();
             connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), edge_detector, SLOT(detect(cv::Mat)));
-            connect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            //connect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
             edge_detector->moveToThread(edge_detector_thread);
             edge_detector_thread->start();
         }
@@ -378,15 +388,6 @@ void MainWindow::on_button_move_down_clicked()
     }
 }
 
-
-void MainWindow::on_groupBox_edge_detection_clicked(bool checked)
-{
-    if (edge_detector) {
-        edge_detector->enabled = checked;
-    }
-}
-
-
 void MainWindow::on_slider_edge_threshold_ratio_valueChanged(int value)
 {
     if (edge_detector) {
@@ -423,11 +424,47 @@ void MainWindow::on_slider_face_scale_factor_valueChanged(int value)
     }
 }
 
-
-void MainWindow::on_groupBox_face_detection_clicked(bool checked)
+void MainWindow::on_groupBox_video_effects_clicked(bool checked)
 {
-    if (face_detector) {
-        face_detector->enabled = checked;
+    if (!is_video_started)
+        return;
+
+    if(checked) {
+        if (ui->face_detection_radio->isChecked()) {
+            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            connect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            face_detector->enabled = true;
+            edge_detector->enabled = false;
+        } else if (ui->edge_detection_radio->isChecked()) {
+            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            connect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            face_detector->enabled = false;
+            edge_detector->enabled = true;
+        }
+    } else {
+        edge_detector->enabled = false;
+        face_detector->enabled = false;
+        connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
     }
+}
+
+void MainWindow::on_edge_detection_radio_clicked()
+{
+    disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    disconnect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    connect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    face_detector->enabled = false;
+    edge_detector->enabled = true;
+}
+
+void MainWindow::on_face_detection_radio_clicked()
+{
+    disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    connect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    face_detector->enabled = true;
+    edge_detector->enabled = false;
 }
 
