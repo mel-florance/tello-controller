@@ -6,12 +6,19 @@
 #include <QObject>
 #include <QTimer>
 #include <QProgressBar>
+#include <QThread>
+#include <QKeyEvent>
 
-#include "udp_controller.h"
+#include "../include/tellocontroller.h"
+#include "../include/videoreader.h"
+
+#include <opencv2/core/core.hpp>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+Q_DECLARE_METATYPE(cv::Mat);
 
 class MainWindow : public QMainWindow
 {
@@ -27,27 +34,58 @@ private slots:
     void on_button_emergency_clicked();
     void on_button_start_video_clicked();
 
+    void on_button_move_back_clicked();
+    void on_button_move_forward_clicked();
+    void on_button_move_left_clicked();
+    void on_button_move_right_clicked();
+    void on_button_move_up_clicked();
+    void on_button_move_down_clicked();
+
+    void on_button_rotate_right_clicked();
+    void on_button_rotate_left_clicked();
+
+    void on_groupBox_edge_detection_clicked(bool checked);
+    void on_groupBox_face_detection_clicked(bool checked);
+
+    void on_slider_edge_threshold_ratio_valueChanged(int value);
+    void on_slider_edge_min_threshold_valueChanged(int value);
+    void on_slider_face_min_neighbors_valueChanged(int value);
+    void on_slider_face_scale_factor_valueChanged(int value);
+
     void on_connected();
     void on_battery(int percent);
-    void on_max_speed(float value);
-    void on_flight_time(int seconds);
+    void on_maxspeed(float value);
+    void on_flighttime(int seconds);
     void on_height(int centimeters);
     void on_temperature(int degrees);
     void on_imu(const QVector3D& vector);
     void on_barometer(float meters);
     void on_acceleration(const QVector3D& vector);
-    void on_time_of_flight(float meters);
-    void on_wifi_snr(int ratio);
+    void on_timeofflight(float meters);
+    void on_wifisnr(int ratio);
 
-    void on_poll_infos();
+    void on_pollinfos();
+    void on_videoframe(cv::Mat matrix);
+
+protected:
+     void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
+    QThread* video_reader_thread;
+    VideoReader* video_reader;
+    QThread* edge_detector_thread;
+    QThread* face_detector_thread;
+    EdgeDetector* edge_detector;
+    FaceDetector* face_detector;
     std::unique_ptr<QProgressBar> progress_bar;
-    std::unique_ptr<UDPController> controller;
+    std::unique_ptr<TelloController> controller;
     std::unique_ptr<QTimer> timer;
     bool is_connected;
     bool is_video_started;
     bool is_flying;
+    float drone_rotation;
+
+    void enable_flight_controls(bool enable);
 };
 #endif // MAINWINDOW_H

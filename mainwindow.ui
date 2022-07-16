@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>801</width>
-    <height>564</height>
+    <width>1180</width>
+    <height>761</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,81 +19,129 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="animated">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <widget class="QLabel" name="video">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>10</y>
+      <width>960</width>
+      <height>720</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>960</width>
+      <height>720</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>960</width>
+      <height>720</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
    <widget class="QGroupBox" name="groupBox_drone_infos">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>191</width>
-      <height>221</height>
+      <x>215</x>
+      <y>15</y>
+      <width>180</width>
+      <height>220</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Informations</string>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
-    <widget class="QLabel" name="label_speed">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>61</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>The maximum speed allowed by the drone</string>
-     </property>
-     <property name="text">
-      <string>Max. speed</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_flight_time">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>130</y>
-       <width>61</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>The flight time session in seconds</string>
-     </property>
-     <property name="text">
-      <string>Flight time</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_height">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>49</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>The actual height in centimers of the drone</string>
-     </property>
-     <property name="text">
-      <string>Height</string>
-     </property>
-    </widget>
+    <property name="minimumSize">
+     <size>
+      <width>180</width>
+      <height>220</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>180</width>
+      <height>240</height>
+     </size>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel{
+	color: white
+} 
+
+QGroupBox{
+	background: rgba(0,0,0,0.6);
+	color: white;
+ 	border: none;
+}</string>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
     <widget class="QLabel" name="label_temperature">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>150</y>
-       <width>71</width>
+       <x>17</x>
+       <y>148</y>
+       <width>80</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="toolTip">
       <string>The drone temperature in degrees celcius</string>
@@ -102,46 +150,76 @@
       <string>Temperature</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_imu">
+    <widget class="QLabel" name="drone_speed">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>49</width>
+       <x>111</x>
+       <y>10</y>
+       <width>50</width>
        <height>16</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>Inertial Measurement Unit: Yaw, Pitch, Roll</string>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
      </property>
      <property name="text">
-      <string>I.M.U</string>
+      <string>0 cm /s</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="label_pressure">
+    <widget class="QLabel" name="drone_temperature">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>170</y>
-       <width>49</width>
+       <x>111</x>
+       <y>148</y>
+       <width>50</width>
        <height>16</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>The atmospheric pressure in millibars</string>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
      </property>
      <property name="text">
-      <string>Pressure</string>
+      <string>0°C</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="label_acceleration">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>71</width>
+       <x>17</x>
+       <y>79</y>
+       <width>80</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="toolTip">
       <string>The acceleration vector of the drone: x, y, z</string>
@@ -150,30 +228,325 @@
       <string>Acceleration</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_tof">
+    <widget class="QLabel" name="drone_tof">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>49</width>
+       <x>111</x>
+       <y>102</y>
+       <width>50</width>
        <height>16</height>
       </rect>
      </property>
-     <property name="toolTip">
-      <string>Time Of Flight: Height in centimers relative from the take off point</string>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
      </property>
      <property name="text">
-      <string>T.O.F</string>
+      <string>0 cm</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_flight_time">
+     <property name="geometry">
+      <rect>
+       <x>17</x>
+       <y>125</y>
+       <width>80</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>The flight time session in seconds</string>
+     </property>
+     <property name="text">
+      <string>Flight time</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="drone_flight_time">
+     <property name="geometry">
+      <rect>
+       <x>111</x>
+       <y>125</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>0 s</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="drone_pressure">
+     <property name="geometry">
+      <rect>
+       <x>111</x>
+       <y>171</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>0 m</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_height">
+     <property name="geometry">
+      <rect>
+       <x>17</x>
+       <y>33</y>
+       <width>80</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>The actual height in centimers of the drone</string>
+     </property>
+     <property name="text">
+      <string>Height</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="drone_imu">
+     <property name="geometry">
+      <rect>
+       <x>111</x>
+       <y>56</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>0, 0, 0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="drone_height">
+     <property name="geometry">
+      <rect>
+       <x>111</x>
+       <y>33</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>0 cm</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="drone_acceleration">
+     <property name="geometry">
+      <rect>
+       <x>111</x>
+       <y>79</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>0, 0, 0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_speed">
+     <property name="geometry">
+      <rect>
+       <x>17</x>
+       <y>10</y>
+       <width>80</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>The maximum speed allowed by the drone</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel{color: white}</string>
+     </property>
+     <property name="text">
+      <string>Max. speed</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_imu">
+     <property name="geometry">
+      <rect>
+       <x>17</x>
+       <y>56</y>
+       <width>80</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Inertial Measurement Unit: Yaw, Pitch, Roll</string>
+     </property>
+     <property name="text">
+      <string>I.M.U</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="drone_wifi">
+     <property name="geometry">
+      <rect>
+       <x>111</x>
+       <y>194</y>
+       <width>50</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>50</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="label_wifi">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>190</y>
-       <width>51</width>
+       <x>17</x>
+       <y>194</y>
+       <width>80</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="toolTip">
       <string>The Wifi Signal Noise Ratio</string>
@@ -182,290 +555,795 @@
       <string>Wifi SNR</string>
      </property>
     </widget>
-    <widget class="QLabel" name="drone_speed">
+    <widget class="QLabel" name="label_tof">
      <property name="geometry">
       <rect>
-       <x>100</x>
-       <y>30</y>
-       <width>91</width>
+       <x>17</x>
+       <y>102</y>
+       <width>80</width>
        <height>16</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>Time Of Flight: Height in centimers relative from the take off point</string>
+     </property>
      <property name="text">
-      <string>0 cm /s</string>
+      <string>T.O.F</string>
      </property>
     </widget>
-    <widget class="QLabel" name="drone_flight_time">
+    <widget class="QLabel" name="label_pressure">
      <property name="geometry">
       <rect>
-       <x>100</x>
-       <y>130</y>
-       <width>91</width>
+       <x>17</x>
+       <y>171</y>
+       <width>80</width>
        <height>16</height>
       </rect>
      </property>
-     <property name="text">
-      <string>0 s</string>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
      </property>
-    </widget>
-    <widget class="QLabel" name="drone_height">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>50</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
+     <property name="toolTip">
+      <string>The atmospheric pressure in millibars</string>
      </property>
      <property name="text">
-      <string>0 cm</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="drone_temperature">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>150</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0°C</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="drone_imu">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>70</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0, 0, 0</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="drone_pressure">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>170</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0 m</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="drone_acceleration">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>90</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0, 0, 0</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="drone_tof">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>110</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0 cm</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="drone_wifi">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>190</y>
-       <width>91</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>0</string>
+      <string>Pressure</string>
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>290</y>
-      <width>191</width>
-      <height>231</height>
+      <x>9</x>
+      <y>9</y>
+      <width>199</width>
+      <height>701</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Actions</string>
-    </property>
-    <widget class="QPushButton" name="button_takeoff">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>171</width>
-       <height>24</height>
-      </rect>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
      </property>
-     <property name="text">
-      <string>Take off</string>
+     <property name="leftMargin">
+      <number>9</number>
      </property>
-    </widget>
-    <widget class="QPushButton" name="button_emergency">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>171</width>
-       <height>131</height>
-      </rect>
+     <property name="topMargin">
+      <number>0</number>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
+     <property name="rightMargin">
+      <number>9</number>
+     </property>
+     <property name="bottomMargin">
+      <number>9</number>
+     </property>
+     <item>
+      <widget class="QGroupBox" name="groupBox_connexion">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>181</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>130</height>
+        </size>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="title">
+        <string>Connexion</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0" columnstretch="0,0">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetFixedSize</enum>
+        </property>
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="input_port">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>8889</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="input_ip">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>192.168.10.1</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_port">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Port</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="button_connect">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>CONNECT</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_ip">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>IP</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_edge_detection">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>120</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="title">
+        <string>Video Edge Detection</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <widget class="QSlider" name="slider_edge_min_threshold">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>161</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>20</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_edge_min_threshold">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Min. Threshold</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="edge_min_threshold">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>30</y>
+          <width>49</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>20</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_edge_threshold_ratio">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Threshold ratio</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="edge_threshold_ratio">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>70</y>
+          <width>49</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </widget>
+       <widget class="QSlider" name="slider_edge_threshold_ratio">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>161</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="maximum">
+         <number>10</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_edge_min_threshold_2">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>340</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Min. Threshold</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_face_detection">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>120</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>120</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Video Face Detection</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <widget class="QSlider" name="slider_face_scale_factor">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>160</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="pageStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>2</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_face_scale_factor">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>61</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Scale factor</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="face_scale_factor">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>30</y>
+          <width>49</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </widget>
+       <widget class="QSlider" name="slider_face_min_neighbors">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>160</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="minimum">
+         <number>3</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>3</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="face_min_neighbors">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>70</y>
+          <width>49</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_face_min_neighbors">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Min. neighbors</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_actions">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>180</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>180</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Actions</string>
+       </property>
+       <widget class="QPushButton" name="button_takeoff">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>30</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Take off</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_start_video">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>60</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Start video</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_emergency">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>102</y>
+          <width>161</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>60</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton {
 	color: red;
 }</string>
-     </property>
-     <property name="text">
-      <string>EMERGENCY</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="button_start_video">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>171</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Start video</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_connexion">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>781</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Connexion</string>
-    </property>
-    <widget class="QLineEdit" name="input_ip">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>113</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>192.168.10.1</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_ip">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>16</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>IP</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="button_connect">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>20</y>
-       <width>101</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>CONNECT</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_port">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>20</y>
-       <width>49</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>PORT</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="input_port">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>20</y>
-       <width>51</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <number>65535</number>
-     </property>
-     <property name="value">
-      <number>8889</number>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QOpenGLWidget" name="openGLWidget">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>70</y>
-      <width>581</width>
-      <height>451</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
+        </property>
+        <property name="text">
+         <string>EMERGENCY</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_flight_controls">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>115</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Flight controls</string>
+       </property>
+       <widget class="QPushButton" name="button_move_left">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>50</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Move left</string>
+        </property>
+        <property name="text">
+         <string>🠈</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_move_forward">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>20</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Move forward</string>
+        </property>
+        <property name="text">
+         <string>🠉</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_move_right">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>50</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Move right</string>
+        </property>
+        <property name="text">
+         <string>🠊</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_move_back">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>80</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Move back</string>
+        </property>
+        <property name="text">
+         <string>🠋</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_move_up">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>20</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Move up</string>
+        </property>
+        <property name="text">
+         <string>🠉</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_move_down">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>80</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Move down</string>
+        </property>
+        <property name="text">
+         <string>🠋</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="text_drone_rotation">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>50</y>
+          <width>31</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="toolTip">
+         <string>Drone angle</string>
+        </property>
+        <property name="text">
+         <string>0°</string>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_rotate_right">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>50</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Rotate right</string>
+        </property>
+        <property name="text">
+         <string>🠊</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="button_rotate_left">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>50</y>
+          <width>30</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Rotate left</string>
+        </property>
+        <property name="text">
+         <string>🠈</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>801</width>
+     <width>1180</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
