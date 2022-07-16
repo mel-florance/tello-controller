@@ -4,7 +4,6 @@
 VideoReader::VideoReader(QObject *parent)
     : QObject{parent}
 {
-
 }
 
 void VideoReader::process()

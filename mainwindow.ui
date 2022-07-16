@@ -827,7 +827,7 @@ QGroupBox{
          </rect>
         </property>
         <property name="text">
-         <string>0</string>
+         <string>20</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_edge_threshold_ratio">
