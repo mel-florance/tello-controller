@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1194</width>
-    <height>821</height>
+    <width>1171</width>
+    <height>823</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -43,8 +43,8 @@
      <rect>
       <x>210</x>
       <y>10</y>
-      <width>960</width>
-      <height>720</height>
+      <width>951</width>
+      <height>761</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -55,14 +55,14 @@
     </property>
     <property name="minimumSize">
      <size>
-      <width>960</width>
-      <height>720</height>
+      <width>480</width>
+      <height>360</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>960</width>
-      <height>720</height>
+      <width>9999</width>
+      <height>9999</height>
      </size>
     </property>
     <property name="autoFillBackground">
@@ -311,7 +311,7 @@ QGroupBox{
       <rect>
        <x>111</x>
        <y>171</y>
-       <width>50</width>
+       <width>70</width>
        <height>16</height>
       </rect>
      </property>
@@ -323,7 +323,7 @@ QGroupBox{
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>70</width>
        <height>16777215</height>
       </size>
      </property>
@@ -361,7 +361,7 @@ QGroupBox{
       <rect>
        <x>111</x>
        <y>56</y>
-       <width>50</width>
+       <width>71</width>
        <height>16</height>
       </rect>
      </property>
@@ -373,7 +373,7 @@ QGroupBox{
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>80</width>
        <height>16777215</height>
       </size>
      </property>
@@ -417,7 +417,7 @@ QGroupBox{
       <rect>
        <x>111</x>
        <y>79</y>
-       <width>50</width>
+       <width>71</width>
        <height>16</height>
       </rect>
      </property>
@@ -429,7 +429,7 @@ QGroupBox{
      </property>
      <property name="maximumSize">
       <size>
-       <width>50</width>
+       <width>80</width>
        <height>16777215</height>
       </size>
      </property>
@@ -1406,7 +1406,7 @@ QGroupBox{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1194</width>
+     <width>1171</width>
      <height>21</height>
     </rect>
    </property>
