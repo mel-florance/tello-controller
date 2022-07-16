@@ -19,12 +19,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->button_emergency->setDisabled(true);
     ui->button_start_video->setDisabled(true);
     ui->groupBox_video_effects->setDisabled(true);
+    ui->button_start_recording->setDisabled(true);
+    ui->recording_dot->setVisible(false);
+    ui->recording_text->setVisible(false);
     enable_flight_controls(false);
 
     QPixmap pxr(960, 720);
     pxr.fill(Qt::black);
     ui->video->setPixmap(pxr);
     ui->video->setAlignment(Qt::AlignCenter);
+
+    video_recorder = new VideoRecorder();
 }
 
 MainWindow::~MainWindow()
@@ -49,7 +54,7 @@ void MainWindow::on_button_connect_clicked()
         is_flying = false;
         progress_bar.reset();
         controller.reset();
-        timer.reset();
+        poll_infos_timer.reset();
     }
     else {
         auto address = ui->input_ip->text();
@@ -100,8 +105,8 @@ void MainWindow::on_connected()
 
     auto ptr = new QTimer(this);
     connect(ptr, SIGNAL(timeout()), this, SLOT(on_pollinfos()));
-    timer.reset(ptr);
-//    timer->start(3000);
+    poll_infos_timer.reset(ptr);
+//    poll_infos_timer->start(3000);
 }
 
 void MainWindow::on_battery(int percent) {
@@ -266,7 +271,16 @@ void MainWindow::on_button_start_video_clicked()
             controller->flush();
             ui->button_start_video->setText("Start video");
             ui->groupBox_video_effects->setDisabled(true);
-            video_reader_thread->terminate();
+            ui->button_start_recording->setDisabled(true);
+
+            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            video_reader->stop();
+            video_reader_thread->quit();
+            face_detector_thread->quit();
+            edge_detector_thread->quit();
+
             QPixmap pxr(ui->video->width(), ui->video->height());
             pxr.fill(Qt::black);
             ui->video->setPixmap(pxr);
@@ -276,6 +290,7 @@ void MainWindow::on_button_start_video_clicked()
             controller->flush();
             ui->button_start_video->setText("Stop video");
             ui->groupBox_video_effects->setDisabled(false);
+            ui->button_start_recording->setDisabled(false);
 
             video_reader_thread = new QThread();
             video_reader = new VideoReader();
@@ -300,6 +315,10 @@ void MainWindow::on_button_start_video_clicked()
 
 void MainWindow::on_videoframe(cv::Mat matrix)
 {
+    if (video_recorder->is_recording()) {
+        video_recorder->write(matrix);
+    }
+
     auto width = ui->video->width();
     auto height = ui->video->height();
     if (width > 960) width = 960;
@@ -308,6 +327,7 @@ void MainWindow::on_videoframe(cv::Mat matrix)
     auto image = QPixmap::fromImage(pixels.rgbSwapped());
     ui->video->setPixmap(image.scaled(width, height, Qt::KeepAspectRatio));
 }
+
 
 void MainWindow::on_button_move_up_clicked()
 {
@@ -466,5 +486,33 @@ void MainWindow::on_face_detection_radio_clicked()
     connect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
     face_detector->enabled = true;
     edge_detector->enabled = false;
+}
+
+
+void MainWindow::on_record_timer()
+{
+    ui->recording_dot->setVisible(!ui->recording_dot->isVisible());
+}
+
+void MainWindow::on_button_start_recording_clicked()
+{
+    if (video_recorder) {
+        if (video_recorder->is_recording()) {
+             video_recorder->stop_record();
+             ui->button_start_recording->setText("Start recording");
+             ui->recording_text->setVisible(false);
+             ui->recording_dot->setVisible(false);
+             record_timer->stop();
+        } else {
+             video_recorder->start_record();
+             ui->button_start_recording->setText("Stop recording");
+             ui->recording_text->setVisible(true);
+
+             auto ptr = new QTimer(this);
+             connect(ptr, SIGNAL(timeout()), this, SLOT(on_record_timer()));
+             record_timer.reset(ptr);
+             record_timer->start(1000);
+        }
+    }
 }
 

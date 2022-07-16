@@ -13,6 +13,7 @@ SOURCES += \
     ./src/mainwindow.cpp \
     ./src/tellocontroller.cpp \
     ./src/videoreader.cpp \
+    ./src/videorecorder.cpp \
     ./src/edgedetector.cpp \
     ./src/facedetector.cpp
 
@@ -20,6 +21,7 @@ HEADERS += \
     ./include/mainwindow.h \
     ./include/tellocontroller.h \
     ./include/videoreader.h \
+    ./include/videorecorder.h \
     ./include/edgedetector.h \
     ./include/facedetector.h
 

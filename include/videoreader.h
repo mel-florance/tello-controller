@@ -15,6 +15,7 @@
 #include <opencv2/core/utility.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/videoio.hpp>
 
 using namespace std::chrono;
 
@@ -23,6 +24,7 @@ class VideoReader : public QObject
     Q_OBJECT
 public:
     explicit VideoReader(QObject *parent = nullptr);
+    void stop();
 
 signals:
     void decoded_frame(cv::Mat matrix);
@@ -31,6 +33,7 @@ public slots:
     void process();
 
 private:
+    bool running;
     cv::Mat decoded;
 };
 
