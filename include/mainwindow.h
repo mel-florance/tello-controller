@@ -74,8 +74,12 @@ private slots:
 
     void on_button_start_recording_clicked();
 
+    void on_splitter_splitterMoved(int pos, int index);
+
 protected:
-     void keyPressEvent(QKeyEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private:
     Ui::MainWindow *ui;

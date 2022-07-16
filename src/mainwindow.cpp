@@ -79,7 +79,7 @@ void MainWindow::on_button_connect_clicked()
         progress_bar_ptr->setVisible(false);
         progress_bar_ptr->setRange(0, 100);
         progress_bar_ptr->setValue(0);
-        progress_bar_ptr->setAlignment(Qt::AlignCenter);
+        progress_bar_ptr->setAlignment(Qt::AlignVCenter);
         progress_bar_ptr->setMaximumSize(180, 19);
         progress_bar_ptr->setTextVisible(true);
         progress_bar_ptr->setFormat("Battery (0 %)");
@@ -218,7 +218,25 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 //        qDebug() << "e pressed";
 //        controller->add_command("up 20");
 //        controller->flush();
-//    }
+    //    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+
+    ui->video->setGeometry(QRect{0, 0,
+        ui->tabWidget->geometry().width(),
+        ui->tabWidget->geometry().height()
+    });
+}
+
+void MainWindow::showEvent(QShowEvent *event)
+{
+    ui->video->setGeometry(QRect{0, 0,
+        ui->tabWidget->geometry().width(),
+        ui->tabWidget->geometry().height()
+    });
 }
 
 void MainWindow::enable_flight_controls(bool enable)
@@ -328,7 +346,6 @@ void MainWindow::on_videoframe(cv::Mat matrix)
     ui->video->setPixmap(image.scaled(width, height, Qt::KeepAspectRatio));
 }
 
-
 void MainWindow::on_button_move_up_clicked()
 {
     if (is_connected && is_flying) {
@@ -336,7 +353,6 @@ void MainWindow::on_button_move_up_clicked()
         controller->flush();
     }
 }
-
 
 void MainWindow::on_button_move_left_clicked()
 {
@@ -514,5 +530,14 @@ void MainWindow::on_button_start_recording_clicked()
              record_timer->start(1000);
         }
     }
+}
+
+
+void MainWindow::on_splitter_splitterMoved(int pos, int index)
+{
+    ui->video->setGeometry(QRect{0, 0,
+        ui->tabWidget->geometry().width(),
+        ui->tabWidget->geometry().height()
+    });
 }
 
