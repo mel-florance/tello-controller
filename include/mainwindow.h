@@ -100,5 +100,6 @@ private:
     float drone_rotation;
 
     void enable_flight_controls(bool enable);
+    void resize_ui_elements();
 };
 #endif // MAINWINDOW_H

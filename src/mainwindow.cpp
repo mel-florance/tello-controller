@@ -30,6 +30,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->video->setAlignment(Qt::AlignCenter);
 
     video_recorder = new VideoRecorder();
+
+    auto progress_bar_ptr = new QProgressBar(this);
+    progress_bar_ptr->setDisabled(true);
+    progress_bar_ptr->setRange(0, 100);
+    progress_bar_ptr->setValue(0);
+    progress_bar_ptr->setAlignment(Qt::AlignVCenter);
+    progress_bar_ptr->setMaximumSize(180, 19);
+    progress_bar_ptr->setTextVisible(true);
+    progress_bar_ptr->setFormat("Battery (0 %)");
+    ui->statusbar->addPermanentWidget(progress_bar_ptr, 2);
+    progress_bar.reset(progress_bar_ptr);
 }
 
 MainWindow::~MainWindow()
@@ -48,11 +59,13 @@ void MainWindow::on_button_connect_clicked()
         ui->button_takeoff->setText("Take off");
         ui->button_takeoff->setDisabled(true);
         ui->button_emergency->setDisabled(true);
+        progress_bar->setDisabled(true);
+        progress_bar->setValue(0);
+        progress_bar->setFormat("Battery (0 %)");
         ui->statusbar->showMessage("Disconnected");
         is_connected = false;
         is_video_started = false;
         is_flying = false;
-        progress_bar.reset();
         controller.reset();
         poll_infos_timer.reset();
     }
@@ -75,17 +88,6 @@ void MainWindow::on_button_connect_clicked()
         controller.reset(ptr);
         controller->init();
 
-        auto progress_bar_ptr = new QProgressBar(this);
-        progress_bar_ptr->setVisible(false);
-        progress_bar_ptr->setRange(0, 100);
-        progress_bar_ptr->setValue(0);
-        progress_bar_ptr->setAlignment(Qt::AlignVCenter);
-        progress_bar_ptr->setMaximumSize(180, 19);
-        progress_bar_ptr->setTextVisible(true);
-        progress_bar_ptr->setFormat("Battery (0 %)");
-        ui->statusbar->addPermanentWidget(progress_bar_ptr, 2);
-        progress_bar.reset(progress_bar_ptr);
-
         ui->statusbar->showMessage("Connecting...");
     }
 }
@@ -100,6 +102,7 @@ void MainWindow::on_connected()
     ui->button_takeoff->setDisabled(false);
     ui->button_emergency->setDisabled(false);
     ui->button_start_video->setDisabled(false);
+    progress_bar->setDisabled(false);
     is_connected = true;
     on_pollinfos();
 
@@ -224,18 +227,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-
-    ui->video->setGeometry(QRect{0, 0,
-        ui->tabWidget->geometry().width(),
-        ui->tabWidget->geometry().height()
-    });
+    resize_ui_elements();
 }
 
 void MainWindow::showEvent(QShowEvent *event)
 {
-    ui->video->setGeometry(QRect{0, 0,
-        ui->tabWidget->geometry().width(),
-        ui->tabWidget->geometry().height()
+    ui->splitter->setStretchFactor(1, 1);
+
+    QTimer::singleShot(10, [=, this]{
+        resize_ui_elements();
     });
 }
 
@@ -249,6 +249,28 @@ void MainWindow::enable_flight_controls(bool enable)
     ui->button_move_down->setDisabled(!enable);
     ui->button_rotate_left->setDisabled(!enable);
     ui->button_rotate_right->setDisabled(!enable);
+}
+
+void MainWindow::resize_ui_elements()
+{
+    ui->video->setGeometry(QRect{0, 0,
+        ui->tabWidget->geometry().width(),
+        ui->tabWidget->geometry().height()
+    });
+
+    ui->recording_text->setGeometry(QRect{
+        ui->tabWidget->geometry().width() - ui->recording_text->geometry().width() - 10,
+        10,
+        ui->recording_text->geometry().width(),
+        ui->recording_text->geometry().height()
+    });
+
+    ui->recording_dot->setGeometry(QRect{
+        ui->tabWidget->geometry().width() - ui->recording_text->geometry().width() - ui->recording_dot->geometry().width() - 15,
+        5,
+        ui->recording_dot->geometry().width(),
+        ui->recording_dot->geometry().height()
+    });
 }
 
 void MainWindow::on_button_takeoff_clicked()

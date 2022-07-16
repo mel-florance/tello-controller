@@ -38,7 +38,7 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0" columnstretch="1" columnminimumwidth="0">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="0" columnstretch="0" columnminimumwidth="0">
     <property name="sizeConstraint">
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
@@ -639,7 +639,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
