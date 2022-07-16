@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
       is_connected(false),
       is_video_started(false),
       is_flying(false),
+      is_alerting(false),
       drone_rotation(0.0f)
 {
     qRegisterMetaType<cv::Mat>();
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->button_start_recording->setDisabled(true);
     ui->recording_dot->setVisible(false);
     ui->recording_text->setVisible(false);
+    ui->alert_message->setVisible(false);
     enable_flight_controls(false);
 
     QPixmap pxr(960, 720);
@@ -112,7 +114,17 @@ void MainWindow::on_connected()
 //    poll_infos_timer->start(3000);
 }
 
-void MainWindow::on_battery(int percent) {
+void MainWindow::on_battery(int percent)
+{
+    if (percent < 10 && !is_alerting && is_flying) {
+        auto ptr = new QTimer(this);
+        connect(ptr, SIGNAL(timeout()), this, SLOT(on_alert_timer()));
+        alert_timer.reset(ptr);
+        alert_timer->start(1000);
+        is_alerting = true;
+        ui->alert_message->setText("BATTERY ALERT\n" + QString::number(percent) + " %\nLAND QUICKLY !");
+    }
+
     progress_bar->setValue(percent);
     progress_bar->setFormat("Battery (" + QString::number(percent) + " %)");
 }
@@ -130,6 +142,15 @@ void MainWindow::on_height(int centimeters) {
 }
 
 void MainWindow::on_temperature(int degrees) {
+    if (degrees > 90 && !is_alerting && is_flying) {
+        auto ptr = new QTimer(this);
+        connect(ptr, SIGNAL(timeout()), this, SLOT(on_alert_timer()));
+        alert_timer.reset(ptr);
+        alert_timer->start(1000);
+        is_alerting = true;
+        ui->alert_message->setText("TEMPERATURE ALERT\n" + QString::number(degrees) + "°C\nLAND QUICKLY !");
+    }
+
     ui->drone_temperature->setText(QString::number(degrees) + "°C");
 }
 
@@ -270,6 +291,13 @@ void MainWindow::resize_ui_elements()
         5,
         ui->recording_dot->geometry().width(),
         ui->recording_dot->geometry().height()
+    });
+
+    ui->alert_message->setGeometry(QRect{
+        (ui->tabWidget->geometry().width()/2) - 350/2,
+        (ui->tabWidget->geometry().height()/2) - 140/2,
+        350,
+        140
     });
 }
 
@@ -530,6 +558,11 @@ void MainWindow::on_face_detection_radio_clicked()
 void MainWindow::on_record_timer()
 {
     ui->recording_dot->setVisible(!ui->recording_dot->isVisible());
+}
+
+void MainWindow::on_alert_timer()
+{
+    ui->alert_message->setVisible(!ui->alert_message->isVisible());
 }
 
 void MainWindow::on_button_start_recording_clicked()

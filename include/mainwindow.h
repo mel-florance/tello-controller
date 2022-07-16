@@ -71,9 +71,9 @@ private slots:
     void on_pollinfos();
     void on_videoframe(cv::Mat matrix);
     void on_record_timer();
+    void on_alert_timer();
 
     void on_button_start_recording_clicked();
-
     void on_splitter_splitterMoved(int pos, int index);
 
 protected:
@@ -94,9 +94,11 @@ private:
     std::unique_ptr<TelloController> controller;
     std::unique_ptr<QTimer> poll_infos_timer;
     std::unique_ptr<QTimer> record_timer;
+    std::unique_ptr<QTimer> alert_timer;
     bool is_connected;
     bool is_video_started;
     bool is_flying;
+    bool is_alerting;
     float drone_rotation;
 
     void enable_flight_controls(bool enable);
