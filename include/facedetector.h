@@ -2,6 +2,7 @@
 #define FACEDETECTOR_H
 
 #include <QObject>
+#include <QVector3D>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -22,6 +23,7 @@ public:
 
 signals:
     void faceframe(cv::Mat matrix);
+    void faceoffset(QVector3D& offset);
 
 public slots:
     void detect(cv::Mat src);

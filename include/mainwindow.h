@@ -8,6 +8,9 @@
 #include <QProgressBar>
 #include <QThread>
 #include <QKeyEvent>
+#include <QVector>
+#include <QListWidgetItem>
+#include <QLabel>
 
 #include "../include/tellocontroller.h"
 #include "../include/videoreader.h"
@@ -72,9 +75,14 @@ private slots:
     void on_videoframe(cv::Mat matrix);
     void on_record_timer();
     void on_alert_timer();
+    void on_faceoffset(QVector3D& offset);
 
     void on_button_start_recording_clicked();
     void on_splitter_splitterMoved(int pos, int index);
+    void on_button_add_waypoint_clicked();
+
+    void on_button_remove_waypoint_clicked();
+    void on_waypoints_list_itemSelectionChanged();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -90,11 +98,14 @@ private:
     QThread* face_detector_thread;
     EdgeDetector* edge_detector;
     FaceDetector* face_detector;
-    std::unique_ptr<QProgressBar> progress_bar;
+    std::unique_ptr<QProgressBar> battery_progress_bar;
+    std::unique_ptr<QProgressBar> wifi_progress_bar;
+    std::unique_ptr<QProgressBar> temperature_progress_bar;
     std::unique_ptr<TelloController> controller;
     std::unique_ptr<QTimer> poll_infos_timer;
     std::unique_ptr<QTimer> record_timer;
     std::unique_ptr<QTimer> alert_timer;
+    QVector<QListWidgetItem*> waypoints;
     bool is_connected;
     bool is_video_started;
     bool is_flying;

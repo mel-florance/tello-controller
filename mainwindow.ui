@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <property name="animated">
    <bool>true</bool>
   </property>
@@ -406,71 +409,103 @@
           <property name="title">
            <string>Actions</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QPushButton" name="button_takeoff">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Take off</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="button_start_video">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Start video</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QPushButton" name="button_start_recording">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Start recording</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QPushButton" name="button_emergency">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>50</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QPushButton {
+          <widget class="QPushButton" name="button_takeoff">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>27</y>
+             <width>161</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Take off</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="button_start_video">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>50</y>
+             <width>161</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Start video</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="button_start_recording">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>73</y>
+             <width>161</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Start recording</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="button_emergency">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>105</y>
+             <width>161</width>
+             <height>61</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
 	color: red;
+
+    font-size: 16px;
+	background:  transparent;
+	border: 1px solid red;
+}
+
+QPushButton:hover:!pressed {
+	color: red;
+	background:  #f0d4d4;
+	border: 1px solid red;
 }</string>
-             </property>
-             <property name="text">
-              <string>EMERGENCY</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           </property>
+           <property name="text">
+            <string>EMERGENCY</string>
+           </property>
+          </widget>
          </widget>
         </item>
         <item>
@@ -709,8 +744,8 @@
         <widget class="QGroupBox" name="groupBox_drone_infos">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>0</y>
+           <x>10</x>
+           <y>10</y>
            <width>180</width>
            <height>220</height>
           </rect>
@@ -742,9 +777,9 @@
 } 
 
 QGroupBox{
-	background: rgba(0,0,0,0.6);
+	background: rgba(0,0,0,0.8);
 	color: white;
- 	border: none;
+ 	border: 1px solid #333;
 }</string>
          </property>
          <property name="title">
@@ -757,28 +792,25 @@ QGroupBox{
           <bool>true</bool>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_speed">
+          <item row="4" column="1">
+           <widget class="QLabel" name="drone_tof">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="minimumSize">
+            <property name="maximumSize">
              <size>
-              <width>80</width>
-              <height>0</height>
+              <width>50</width>
+              <height>16777215</height>
              </size>
             </property>
-            <property name="toolTip">
-             <string>The maximum speed allowed by the drone</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel{color: white}</string>
-            </property>
             <property name="text">
-             <string>Max. speed</string>
+             <string>0 cm</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -804,46 +836,14 @@ QGroupBox{
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_height">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>The actual height in centimers of the drone</string>
-            </property>
-            <property name="text">
-             <string>Height</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="drone_height">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_speed">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>0 cm</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_imu">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -851,10 +851,29 @@ QGroupBox{
              </size>
             </property>
             <property name="toolTip">
-             <string>Inertial Measurement Unit: Yaw, Pitch, Roll</string>
+             <string>The maximum speed allowed by the drone</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel{color: white}</string>
             </property>
             <property name="text">
-             <string>I.M.U</string>
+             <string>Max. speed</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_pressure">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>The atmospheric pressure in millibars</string>
+            </property>
+            <property name="text">
+             <string>Pressure</string>
             </property>
            </widget>
           </item>
@@ -896,82 +915,6 @@ QGroupBox{
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLabel" name="drone_acceleration">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>0, 0, 0</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_tof">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Time Of Flight: Height in centimers relative from the take off point</string>
-            </property>
-            <property name="text">
-             <string>T.O.F</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLabel" name="drone_tof">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>0 cm</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_flight_time">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>The flight time session in seconds</string>
-            </property>
-            <property name="text">
-             <string>Flight time</string>
-            </property>
-           </widget>
-          </item>
           <item row="5" column="1">
            <widget class="QLabel" name="drone_flight_time">
             <property name="sizePolicy">
@@ -1010,6 +953,44 @@ QGroupBox{
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_height">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>The actual height in centimers of the drone</string>
+            </property>
+            <property name="text">
+             <string>Height</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="drone_height">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>0 cm</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
           <item row="6" column="1">
            <widget class="QLabel" name="drone_temperature">
             <property name="sizePolicy">
@@ -1029,22 +1010,6 @@ QGroupBox{
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_pressure">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>The atmospheric pressure in millibars</string>
-            </property>
-            <property name="text">
-             <string>Pressure</string>
             </property>
            </widget>
           </item>
@@ -1070,14 +1035,8 @@ QGroupBox{
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_wifi">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_imu">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -1085,38 +1044,64 @@ QGroupBox{
              </size>
             </property>
             <property name="toolTip">
-             <string>The Wifi Signal Noise Ratio</string>
+             <string>Inertial Measurement Unit: Yaw, Pitch, Roll</string>
             </property>
             <property name="text">
-             <string>Wifi SNR</string>
+             <string>I.M.U</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
-           <widget class="QLabel" name="drone_wifi">
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_tof">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Time Of Flight: Height in centimers relative from the take off point</string>
+            </property>
+            <property name="text">
+             <string>T.O.F</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="drone_acceleration">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="minimumSize">
-             <size>
-              <width>30</width>
-              <height>0</height>
-             </size>
-            </property>
             <property name="maximumSize">
              <size>
-              <width>50</width>
+              <width>80</width>
               <height>16777215</height>
              </size>
             </property>
             <property name="text">
-             <string>0</string>
+             <string>0, 0, 0</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_flight_time">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>The flight time session in seconds</string>
+            </property>
+            <property name="text">
+             <string>Flight time</string>
             </property>
            </widget>
           </item>
@@ -1194,13 +1179,59 @@ QGroupBox{
         <attribute name="title">
          <string>Waypoints</string>
         </attribute>
+        <widget class="QPushButton" name="button_add_waypoint">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>80</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="button_remove_waypoint">
+         <property name="geometry">
+          <rect>
+           <x>90</x>
+           <y>10</y>
+           <width>80</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Remove</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QListWidget" name="waypoints_list">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>40</y>
+           <width>161</width>
+           <height>201</height>
+          </rect>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::MultiSelection</enum>
+         </property>
+        </widget>
        </widget>
       </widget>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
