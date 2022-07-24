@@ -22,11 +22,11 @@ public:
     int min_neighbors;
 
 signals:
-    void faceframe(cv::Mat matrix);
+    void faceframe(cv::Mat& matrix);
     void faceoffset(QVector3D& offset);
 
 public slots:
-    void detect(cv::Mat src);
+    void detect(cv::Mat& src);
 
 private:
     cv::Mat matrix;

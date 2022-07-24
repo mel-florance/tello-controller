@@ -1,10 +1,11 @@
-#include "../include/tellocontroller.h"
+#include "../include/networkcontroller.h"
 
-TelloController::TelloController(
+NetworkController::NetworkController(
         QObject *parent,
         const QHostAddress& address,
         quint16 port) :
     QObject{parent},
+    debug(true),
     address(address),
     port(port),
     commands({})
@@ -14,36 +15,38 @@ TelloController::TelloController(
     connect(socket, SIGNAL(readyRead()), this, SLOT(ready_read()));
 }
 
-void TelloController::send(const QByteArray& data)
+void NetworkController::send(const QByteArray& data)
 {
     socket->writeDatagram(data, address, port);
 }
 
-void TelloController::add_command(const QString& command)
+void NetworkController::add_command(const QString& command)
 {
     commands.push_back(command);
 }
 
-void TelloController::flush()
+void NetworkController::flush()
 {
     if (!commands.empty()) {
         auto next = commands.dequeue();
+        last_command = current_command;
         current_command = next;
         send(next.toUtf8());
     }
 }
 
-void TelloController::init()
+void NetworkController::init()
 {
     add_command("command");
     flush();
 }
 
-void TelloController::ready_read()
+void NetworkController::ready_read()
 {
     QHostAddress sender;
     quint16 sender_port;
     QByteArray buffer;
+
     buffer.resize(socket->pendingDatagramSize());
     socket->readDatagram(buffer.data(), buffer.size(), &sender, &sender_port);
 
@@ -52,11 +55,16 @@ void TelloController::ready_read()
         return;
     }
 
-    qDebug() << "Current command: " << current_command;
-    qDebug() << "Message data: " << buffer;
+    if (debug) {
+        qDebug() << "Current command: " << current_command;
+        qDebug() << "Last command" << last_command;
+        qDebug() << "Current buffer: " << buffer;
+        qDebug() << "Last buffer: " << last_buffer;
+    }
 
     if (current_command == "command" && buffer == "ok") {
-        qDebug() << "Entering SDK command mode: OK." << buffer;
+        if (debug)
+            qDebug() << "Entering SDK command mode: OK." << buffer;
         emit on_controller_ready();
     }
     else if (current_command == "speed?") {
@@ -133,4 +141,6 @@ void TelloController::ready_read()
         emit on_controller_wifi_snr(value.toInt());
         flush();
     }
+
+    last_buffer = buffer;
 }

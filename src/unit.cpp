@@ -1,0 +1,28 @@
+#include "../include/unit.h"
+
+std::unordered_map<Unit::Type, const char*> Unit::symbols = {
+    {Type::KELVIN, "K"},
+    {Type::FAHRENHEIT, "°F"},
+    {Type::CELCIUS, "°C"},
+    {Type::DEGREES, "°"},
+    {Type::RADIANS, "rad"},
+    {Type::MILLIMETER, "mm"},
+    {Type::CENTIMETER, "cm"},
+    {Type::DECIMETER, "dm"},
+    {Type::METER, "m"},
+    {Type::KILOMETER, "km"},
+    {Type::MILLISECOND, "ms"},
+    {Type::SECOND, "s"},
+    {Type::MINUTE, "m"},
+    {Type::HOUR, "h"},
+    {Type::DAY, "d"},
+    {Type::MONTH, "m"},
+    {Type::YEAR, "y"},
+    {Type::ATMOSPHERE, "atm"},
+    {Type::BAR, "bar"},
+    {Type::MILLIBAR, "Mbar"},
+    {Type::PASCAL, "Pa"},
+    {Type::PSI, "psi"},
+    {Type::TORR, "Torr"},
+    {Type::PERCENT, "%"},
+};

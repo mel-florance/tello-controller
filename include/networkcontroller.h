@@ -1,16 +1,20 @@
-#ifndef TELLOCONTROLLER_H
-#define TELLOCONTROLLER_H
+#ifndef NETWORKCONTROLLER_H
+#define NETWORKCONTROLLER_H
 
+#include <chrono>
 #include <QObject>
 #include <QUdpSocket>
 #include <QQueue>
 #include <QVector3D>
+#include <QVariant>
 
-class TelloController : public QObject
+using namespace std::chrono;
+
+class NetworkController : public QObject
 {
     Q_OBJECT
 public:
-    explicit TelloController(
+    explicit NetworkController(
         QObject *parent = nullptr,
         const QHostAddress& address = QHostAddress("192.168.10.1"),
         quint16 port = 8889
@@ -33,16 +37,19 @@ signals:
     void on_controller_acceleration(const QVector3D& vector);
     void on_controller_time_of_flight(float meters);
     void on_controller_wifi_snr(int ratio);
-
 public slots:
     void ready_read();
 
 private:
+    bool debug;
     QHostAddress address;
     quint16 port;
     QUdpSocket* socket;
+
     QString current_command;
+    QString last_command;
+    QByteArray last_buffer;
     QQueue<QString> commands;
 };
 
-#endif // TELLOCONTROLLER_H
+#endif // NETWORKCONTROLLER_H

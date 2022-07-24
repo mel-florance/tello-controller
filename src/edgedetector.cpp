@@ -9,7 +9,7 @@ EdgeDetector::EdgeDetector(QObject *parent)
 {
 }
 
-void EdgeDetector::detect(cv::Mat src)
+void EdgeDetector::detect(cv::Mat& src)
 {
     if (src.empty() || !enabled)
         return;

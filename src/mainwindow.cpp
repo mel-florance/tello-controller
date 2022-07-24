@@ -6,12 +6,14 @@ MainWindow::MainWindow(QWidget *parent)
       ui(new Ui::MainWindow)
     , battery_progress_bar(nullptr),
       wifi_progress_bar(nullptr),
-      controller(nullptr),
+      network_controller(nullptr),
+      flight_controller(nullptr),
       is_connected(false),
       is_video_started(false),
       is_flying(false),
       is_alerting(false),
-      drone_rotation(0.0f)
+      drone_rotation(0.0f),
+      follow_target(false)
 {
     qRegisterMetaType<cv::Mat>();
 
@@ -28,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->button_remove_waypoint->setDisabled(true);
     ui->statusbar->setStyleSheet("background-color: rgb(220, 220, 220);");
 
+    flight_controller = std::make_unique<FlightController>(this);
     enable_flight_controls(false);
 
     QPixmap pxr(960, 720);
@@ -36,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->video->setAlignment(Qt::AlignCenter);
 
     video_recorder = new VideoRecorder();
+    auto waypoint_editor_ptr = new WaypointEditor();
+    waypoint_editor.reset(waypoint_editor_ptr);
+    ui->tabWidget->addTab(waypoint_editor.get(), "Waypoints");
 
     auto battery_progress_bar_ptr = new QProgressBar(this);
     battery_progress_bar_ptr->setDisabled(true);
@@ -97,14 +103,14 @@ void MainWindow::on_button_connect_clicked()
         is_connected = false;
         is_video_started = false;
         is_flying = false;
-        controller.reset();
+        network_controller.reset();
         poll_infos_timer.reset();
     }
     else {
         auto address = ui->input_ip->text();
         auto port = ui->input_port->text();
 
-        auto ptr = new TelloController(this, QHostAddress(address), port.toUShort());
+        auto ptr = new NetworkController(this, QHostAddress(address), port.toUShort());
         connect(ptr, SIGNAL(on_controller_ready()), this, SLOT(on_connected()));
         connect(ptr, SIGNAL(on_controller_max_speed(float)), this, SLOT(on_maxspeed(float)));
         connect(ptr, SIGNAL(on_controller_battery(int)), this, SLOT(on_battery(int)));
@@ -116,8 +122,9 @@ void MainWindow::on_button_connect_clicked()
         connect(ptr, SIGNAL(on_controller_acceleration(const QVector3D&)), this, SLOT(on_acceleration(const QVector3D&)));
         connect(ptr, SIGNAL(on_controller_time_of_flight(float)), this, SLOT(on_timeofflight(float)));
         connect(ptr, SIGNAL(on_controller_wifi_snr(int)), this, SLOT(on_wifisnr(int)));
-        controller.reset(ptr);
-        controller->init();
+        network_controller.reset(ptr);
+        network_controller->init();
+        flight_controller->set_network_controller(network_controller);
 
         ui->statusbar->showMessage("Connecting...");
     }
@@ -149,10 +156,13 @@ void MainWindow::on_battery(int percent)
 {
     if (percent < 10 && !is_alerting) {
         auto ptr = new QTimer(this);
-        connect(ptr, SIGNAL(timeout()), this, SLOT(on_alert_timer()));
+        connect(ptr, SIGNAL(timeout()), this, SLOT(on_alerttimer()));
         alert_timer.reset(ptr);
         alert_timer->start(1000);
         is_alerting = true;
+        ui->alert_message->setText("BATTERY ALERT\n" + QString::number(percent) + " %\nFIND A PLACE TO LAND");
+    }
+    else if (is_alerting) {
         ui->alert_message->setText("BATTERY ALERT\n" + QString::number(percent) + " %\nFIND A PLACE TO LAND");
     }
 
@@ -182,7 +192,6 @@ void MainWindow::on_temperature(int degrees) {
         ui->alert_message->setText("TEMPERATURE ALERT\n" + QString::number(degrees) + "°C\nFIND A PLACE TO LAND");
     }
 
-    ui->drone_temperature->setText(QString::number(degrees) + "°C");
     temperature_progress_bar->setValue(degrees);
     temperature_progress_bar->setFormat("Temperature (" + QString::number(degrees) + "°C)");
 }
@@ -226,9 +235,9 @@ void MainWindow::on_pollinfos()
         };
 
         for (auto& command : commands)
-            controller->add_command(command);
+            network_controller->add_command(command);
 
-        controller->flush();
+        network_controller->flush();
     }
 }
 
@@ -240,43 +249,43 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 //    if(event->key() == Qt::Key_Z)
 //    {
 //        qDebug() << "z pressed";
-//        controller->add_command("forward 20");
-//        controller->flush();
+//        network_controller->add_command("forward 20");
+//        network_controller->flush();
 //    }
 
 //    if(event->key() == Qt::Key_S)
 //    {
 //        qDebug() << "s pressed";
-//        controller->add_command("back 20");
-//        controller->flush();
+//        network_controller->add_command("back 20");
+//        network_controller->flush();
 //    }
 
 //    if(event->key() == Qt::Key_Q)
 //    {
 //        qDebug() << "q pressed";
-//        controller->add_command("left 20");
-//        controller->flush();
+//        network_controller->add_command("left 20");
+//        network_controller->flush();
 //    }
 
 //    if(event->key() == Qt::Key_D)
 //    {
 //        qDebug() << "d pressed";
-//        controller->add_command("right 20");
-//        controller->flush();
+//        network_controller->add_command("right 20");
+//        network_controller->flush();
 //    }
 
 //    if(event->key() == Qt::Key_A)
 //    {
 //        qDebug() << "a pressed";
-//        controller->add_command("down 20");
-//        controller->flush();
+//        network_controller->add_command("down 20");
+//        network_controller->flush();
 //    }
 
 //    if(event->key() == Qt::Key_E)
 //    {
 //        qDebug() << "e pressed";
-//        controller->add_command("up 20");
-//        controller->flush();
+//        network_controller->add_command("up 20");
+//        network_controller->flush();
     //    }
 }
 
@@ -341,15 +350,15 @@ void MainWindow::on_button_takeoff_clicked()
     if (is_connected) {
         if (is_flying) {
             is_flying = false;
-            controller->add_command("land");
-            controller->flush();
+            network_controller->add_command("land");
+            network_controller->flush();
             ui->button_takeoff->setText("Take off");
             enable_flight_controls(false);
 
         } else {
             is_flying = true;
-            controller->add_command("takeoff");
-            controller->flush();
+            network_controller->add_command("takeoff");
+            network_controller->flush();
             ui->button_takeoff->setText("Land");
             enable_flight_controls(true);
         }
@@ -359,8 +368,8 @@ void MainWindow::on_button_takeoff_clicked()
 void MainWindow::on_button_emergency_clicked()
 {
     if (is_connected) {
-        controller->add_command("emergency");
-        controller->flush();
+        network_controller->add_command("emergency");
+        network_controller->flush();
     }
 }
 
@@ -370,15 +379,15 @@ void MainWindow::on_button_start_video_clicked()
     if (is_connected) {
         if (is_video_started) {
             is_video_started = false;
-            controller->add_command("streamoff");
-            controller->flush();
+            network_controller->add_command("streamoff");
+            network_controller->flush();
             ui->button_start_video->setText("Start video");
             ui->groupBox_video_effects->setDisabled(true);
             ui->button_start_recording->setDisabled(true);
 
-            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-            disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-            disconnect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+            disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+            disconnect(face_detector, SIGNAL(faceframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
             video_reader->stop();
             video_reader_thread->quit();
             face_detector_thread->quit();
@@ -389,8 +398,8 @@ void MainWindow::on_button_start_video_clicked()
             ui->video->setPixmap(pxr);
         } else {
             is_video_started = true;
-            controller->add_command("streamon");
-            controller->flush();
+            network_controller->add_command("streamon");
+            network_controller->flush();
             ui->button_start_video->setText("Stop video");
             ui->groupBox_video_effects->setDisabled(false);
             ui->button_start_recording->setDisabled(false);
@@ -399,7 +408,7 @@ void MainWindow::on_button_start_video_clicked()
             video_reader = new VideoReader();
             video_reader->moveToThread(video_reader_thread);
             connect(video_reader_thread, &QThread::started, video_reader, &VideoReader::process);
-            connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            connect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
             connect(video_reader_thread, &QThread::finished, video_reader_thread, &QThread::deleteLater);
             video_reader_thread->start();
 
@@ -417,7 +426,7 @@ void MainWindow::on_button_start_video_clicked()
     }
 }
 
-void MainWindow::on_videoframe(cv::Mat matrix)
+void MainWindow::on_videoframe(cv::Mat& matrix)
 {
     if (video_recorder->is_recording()) {
         video_recorder->write(matrix);
@@ -435,16 +444,16 @@ void MainWindow::on_videoframe(cv::Mat matrix)
 void MainWindow::on_button_move_up_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("up 20");
-        controller->flush();
+        network_controller->add_command("up 20");
+        network_controller->flush();
     }
 }
 
 void MainWindow::on_button_move_left_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("left 20");
-        controller->flush();
+        network_controller->add_command("left 20");
+        network_controller->flush();
     }
 }
 
@@ -452,8 +461,8 @@ void MainWindow::on_button_move_left_clicked()
 void MainWindow::on_button_move_forward_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("forward 100");
-        controller->flush();
+        network_controller->add_command("forward 100");
+        network_controller->flush();
     }
 }
 
@@ -461,8 +470,8 @@ void MainWindow::on_button_move_forward_clicked()
 void MainWindow::on_button_rotate_left_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("ccw 20");
-        controller->flush();
+        network_controller->add_command("ccw 20");
+        network_controller->flush();
         drone_rotation -= 20;
         ui->text_drone_rotation->setText(QString::number(drone_rotation) + "°");
     }
@@ -472,8 +481,8 @@ void MainWindow::on_button_rotate_left_clicked()
 void MainWindow::on_button_move_right_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("right 20");
-        controller->flush();
+        network_controller->add_command("right 20");
+        network_controller->flush();
     }
 }
 
@@ -481,8 +490,8 @@ void MainWindow::on_button_move_right_clicked()
 void MainWindow::on_button_rotate_right_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("cw 20");
-        controller->flush();
+        network_controller->add_command("cw 20");
+        network_controller->flush();
         drone_rotation += 20;
         ui->text_drone_rotation->setText(QString::number(drone_rotation) + "°");
     }
@@ -492,8 +501,8 @@ void MainWindow::on_button_rotate_right_clicked()
 void MainWindow::on_button_move_back_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("back 20");
-        controller->flush();
+        network_controller->add_command("back 20");
+        network_controller->flush();
     }
 }
 
@@ -501,8 +510,8 @@ void MainWindow::on_button_move_back_clicked()
 void MainWindow::on_button_move_down_clicked()
 {
     if (is_connected && is_flying) {
-        controller->add_command("down 20");
-        controller->flush();
+        network_controller->add_command("down 20");
+        network_controller->flush();
     }
 }
 
@@ -549,97 +558,63 @@ void MainWindow::on_groupBox_video_effects_clicked(bool checked)
 
     if(checked) {
         if (ui->face_detection_radio->isChecked()) {
-            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-            disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-            connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), face_detector, SLOT(detect(cv::Mat)));
-            connect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+            disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+            connect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), face_detector, SLOT(detect(cv::Mat&)));
+            connect(face_detector, SIGNAL(faceframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
             face_detector->enabled = true;
             edge_detector->enabled = false;
         } else if (ui->edge_detection_radio->isChecked()) {
-            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-            disconnect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-            connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), edge_detector, SLOT(detect(cv::Mat)));
-            connect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+            disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+            disconnect(face_detector, SIGNAL(faceframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+            connect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), edge_detector, SLOT(detect(cv::Mat&)));
+            connect(edge_detector, SIGNAL(edgeframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
             face_detector->enabled = false;
             edge_detector->enabled = true;
         }
     } else {
         edge_detector->enabled = false;
         face_detector->enabled = false;
-        connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+        connect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
     }
 }
 
 void MainWindow::on_edge_detection_radio_clicked()
 {
-    disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-    disconnect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-    connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), edge_detector, SLOT(detect(cv::Mat)));
-    connect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+    disconnect(face_detector, SIGNAL(faceframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+    connect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), edge_detector, SLOT(detect(cv::Mat&)));
+    connect(edge_detector, SIGNAL(edgeframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
     face_detector->enabled = false;
     edge_detector->enabled = true;
 }
 
 void MainWindow::on_face_detection_radio_clicked()
 {
-    disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-    disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
-    connect(video_reader, SIGNAL(decoded_frame(cv::Mat)), face_detector, SLOT(detect(cv::Mat)));
-    connect(face_detector, SIGNAL(faceframe(cv::Mat)), this, SLOT(on_videoframe(cv::Mat)));
+    disconnect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+    disconnect(edge_detector, SIGNAL(edgeframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
+    connect(video_reader, SIGNAL(decoded_frame(cv::Mat&)), face_detector, SLOT(detect(cv::Mat&)));
+    connect(face_detector, SIGNAL(faceframe(cv::Mat&)), this, SLOT(on_videoframe(cv::Mat&)));
     face_detector->enabled = true;
     edge_detector->enabled = false;
 }
 
 
-void MainWindow::on_record_timer()
+void MainWindow::on_recordtimer()
 {
     ui->recording_dot->setVisible(!ui->recording_dot->isVisible());
 }
 
-void MainWindow::on_alert_timer()
+void MainWindow::on_alerttimer()
 {
     ui->alert_message->setVisible(!ui->alert_message->isVisible());
 }
 
-// Move drone according to the face tracking results.
-// Ajust the position by calculating the offset from the detected centered square.
-// Then apply this offset as a delta vector and convert it to flight control commands.
 void MainWindow::on_faceoffset(QVector3D &offset)
 {
-    qDebug() << "Offset: " << offset;
-
-    if (offset.x() >= -90 && offset.x() <= 90 && offset.x() != 0) {
-        if (offset.x() < 0) {
-            controller->add_command("cw 10");
-            controller->flush();
-            drone_rotation += 10;
-        } else if (offset.x() > 0) {
-            controller->add_command("ccw 10");
-            controller->flush();
-            drone_rotation -= 10;
-        }
-    }
-
-    if (offset.y() >= -70 && offset.y() <= 70 && offset.y() != -30) {
-        if (offset.y() < 0) {
-            controller->add_command("up 20");
-            controller->flush();
-        } else if (offset.y() > 0) {
-            controller->add_command("down 20");
-            controller->flush();
-        }
-    }
-
-    if (offset.z() >= 15000 && offset.z() <= 30000 && offset.z() != -30) {
-        if (offset.z() < 15000) {
-            controller->add_command("forward 20");
-            controller->flush();
-
-        } else if (offset.z() > 30000) {
-            controller->add_command("back 20");
-            controller->flush();
-        }
-    }
+    if (!follow_target) return;
+    flight_controller->set_metric_value(FlightController::MetricName::TARGET, offset);
+    flight_controller->update();
 }
 
 void MainWindow::on_button_start_recording_clicked()
@@ -657,7 +632,7 @@ void MainWindow::on_button_start_recording_clicked()
              ui->recording_text->setVisible(true);
 
              auto ptr = new QTimer(this);
-             connect(ptr, SIGNAL(timeout()), this, SLOT(on_record_timer()));
+             connect(ptr, SIGNAL(timeout()), this, SLOT(on_recordtimer()));
              record_timer.reset(ptr);
              record_timer->start(1000);
         }
@@ -706,5 +681,11 @@ void MainWindow::on_waypoints_list_itemSelectionChanged()
     else {
         ui->button_remove_waypoint->setDisabled(true);
     }
+}
+
+
+void MainWindow::on_checkbox_follow_target_clicked(bool checked)
+{
+    follow_target = checked;
 }
 

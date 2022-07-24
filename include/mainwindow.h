@@ -9,14 +9,19 @@
 #include <QThread>
 #include <QKeyEvent>
 #include <QVector>
+#include <QPainter>
 #include <QListWidgetItem>
 #include <QLabel>
 
-#include "../include/tellocontroller.h"
+#include "../include/networkcontroller.h"
+#include "../include/flightcontroller.h"
 #include "../include/videoreader.h"
 #include "../include/videorecorder.h"
+#include "../include/waypointeditor.h"
 
 #include <opencv2/core/core.hpp>
+
+using namespace std::chrono;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -72,9 +77,9 @@ private slots:
     void on_wifisnr(int ratio);
 
     void on_pollinfos();
-    void on_videoframe(cv::Mat matrix);
-    void on_record_timer();
-    void on_alert_timer();
+    void on_videoframe(cv::Mat& matrix);
+    void on_recordtimer();
+    void on_alerttimer();
     void on_faceoffset(QVector3D& offset);
 
     void on_button_start_recording_clicked();
@@ -83,6 +88,8 @@ private slots:
 
     void on_button_remove_waypoint_clicked();
     void on_waypoints_list_itemSelectionChanged();
+
+    void on_checkbox_follow_target_clicked(bool checked);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -101,16 +108,20 @@ private:
     std::unique_ptr<QProgressBar> battery_progress_bar;
     std::unique_ptr<QProgressBar> wifi_progress_bar;
     std::unique_ptr<QProgressBar> temperature_progress_bar;
-    std::unique_ptr<TelloController> controller;
+    std::shared_ptr<NetworkController> network_controller;
+    std::unique_ptr<FlightController> flight_controller;
     std::unique_ptr<QTimer> poll_infos_timer;
     std::unique_ptr<QTimer> record_timer;
     std::unique_ptr<QTimer> alert_timer;
     QVector<QListWidgetItem*> waypoints;
+    std::unique_ptr<WaypointEditor> waypoint_editor;
     bool is_connected;
     bool is_video_started;
     bool is_flying;
     bool is_alerting;
     float drone_rotation;
+    bool follow_target;
+    time_point<system_clock> last_command_time;
 
     void enable_flight_controls(bool enable);
     void resize_ui_elements();

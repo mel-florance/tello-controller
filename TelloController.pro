@@ -11,19 +11,26 @@ CONFIG += c++20
 SOURCES += \
     ./src/main.cpp \
     ./src/mainwindow.cpp \
-    ./src/tellocontroller.cpp \
+    ./src/networkcontroller.cpp \
     ./src/videoreader.cpp \
     ./src/videorecorder.cpp \
     ./src/edgedetector.cpp \
-    ./src/facedetector.cpp
+    ./src/facedetector.cpp \
+    ./src/waypointeditor.cpp \
+    ./src/flightcontroller.cpp \
+    src/unit.cpp
 
 HEADERS += \
     ./include/mainwindow.h \
-    ./include/tellocontroller.h \
+    ./include/networkcontroller.h \
     ./include/videoreader.h \
     ./include/videorecorder.h \
     ./include/edgedetector.h \
-    ./include/facedetector.h
+    ./include/facedetector.h \
+    ./include/waypointeditor.h \
+    ./include/flightcontroller.h \
+    ./include/metric.h \
+    ./include/unit.h
 
 FORMS += \
     mainwindow.ui

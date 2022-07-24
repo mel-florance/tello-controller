@@ -27,7 +27,7 @@ public:
     void stop();
 
 signals:
-    void decoded_frame(cv::Mat matrix);
+    void decoded_frame(cv::Mat& matrix);
 
 public slots:
     void process();

@@ -21,10 +21,10 @@ public:
     int kernel_size;
 
 signals:
-    void edgeframe(cv::Mat frame);
+    void edgeframe(cv::Mat& frame);
 
 public slots:
-    void detect(cv::Mat src);
+    void detect(cv::Mat& src);
 };
 
 #endif // EDGEDETECTOR_H
