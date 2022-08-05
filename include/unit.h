@@ -8,19 +8,33 @@
 
 struct Unit {
     enum class Type {
+        NONE,
+
+        // Temperature
         KELVIN,
         FAHRENHEIT,
         CELCIUS,
 
+        // Angles
         DEGREES,
         RADIANS,
 
+        // Distances
         MILLIMETER,
         CENTIMETER,
         DECIMETER,
         METER,
         KILOMETER,
 
+        // Distance / time
+        MILLE_PER_HOUR,
+        FOOT_PER_SECOND,
+        CENTIMETER_PER_SECOND,
+        METER_PER_SECOND,
+        KILOMETER_PER_HOUR,
+        KNOTS,
+
+        // Time
         MILLISECOND,
         SECOND,
         MINUTE,
@@ -29,6 +43,7 @@ struct Unit {
         MONTH,
         YEAR,
 
+        // Pressure
         ATMOSPHERE,
         BAR,
         MILLIBAR,
@@ -36,11 +51,13 @@ struct Unit {
         PSI,
         TORR,
 
-        PERCENT
+        // Generic
+        PERCENT,
     };
 
     inline const char* type_to_str(Type type) {
         switch (type) {
+        case Type::NONE: return "NONE";
         case Type::KELVIN: return "KELVIN";
         case Type::FAHRENHEIT: return "FAHRENHEIT";
         case Type::CELCIUS: return "CELCIUS";
@@ -51,6 +68,12 @@ struct Unit {
         case Type::DECIMETER: return "DECIMETER";
         case Type::METER: return "METER";
         case Type::KILOMETER: return "KILOMETER";
+        case Type::MILLE_PER_HOUR: return "MILLE_PER_HOUR";
+        case Type::FOOT_PER_SECOND: return "FOOT_PER_SECOND";
+        case Type::CENTIMETER_PER_SECOND: return "CENTIMETER_PER_SECOND";
+        case Type::METER_PER_SECOND: return "METER_PER_SECOND";
+        case Type::KILOMETER_PER_HOUR: return "KILOMETER_PER_HOUR";
+        case Type::KNOTS: return "KNOTS";
         case Type::MILLISECOND: return "MILLISECOND";
         case Type::SECOND: return "SECOND";
         case Type::MINUTE: return "MINUTE";
@@ -68,7 +91,7 @@ struct Unit {
         }
     }
 
-    inline std::optional<float> to(Type other, float value)
+    inline std::optional<double> to(Type other, double value)
     {
         if (type == Type::KELVIN && other == Type::FAHRENHEIT)
             return value * (9.0f / 5.0f) - 459.67f;
@@ -334,6 +357,84 @@ struct Unit {
         else if (type == Type::TORR && other == Type::PSI)
             return value / 51.715f;
         else if (type == Type::TORR && other == Type::TORR)
+            return value;
+
+        else if (type == Type::MILLE_PER_HOUR && other == Type::FOOT_PER_SECOND)
+            return value * 1.467f;
+        else if (type == Type::MILLE_PER_HOUR && other == Type::CENTIMETER_PER_SECOND)
+            return value / 44.704f;
+        else if (type == Type::MILLE_PER_HOUR && other == Type::METER_PER_SECOND)
+            return value / 2.237f;
+        else if (type == Type::MILLE_PER_HOUR && other == Type::KILOMETER_PER_HOUR)
+            return value * 1.609f;
+        else if (type == Type::MILLE_PER_HOUR && other == Type::KNOTS)
+            return value / 1.151f;
+        else if (type == Type::MILLE_PER_HOUR && other == Type::MILLE_PER_HOUR)
+            return value;
+
+        else if (type == Type::FOOT_PER_SECOND && other == Type::MILLE_PER_HOUR)
+            return value / 1.467f;
+        else if (type == Type::FOOT_PER_SECOND && other == Type::CENTIMETER_PER_SECOND)
+            return value / 30.48f;
+        else if (type == Type::FOOT_PER_SECOND && other == Type::METER_PER_SECOND)
+            return value / 3.281f;
+        else if (type == Type::FOOT_PER_SECOND && other == Type::KILOMETER_PER_HOUR)
+            return value * 1.097f;
+        else if (type == Type::FOOT_PER_SECOND && other == Type::KNOTS)
+            return value / 1.688f;
+        else if (type == Type::FOOT_PER_SECOND && other == Type::FOOT_PER_SECOND)
+            return value;
+
+        else if (type == Type::CENTIMETER_PER_SECOND && other == Type::MILLE_PER_HOUR)
+            return value / 44.704f;
+        else if (type == Type::CENTIMETER_PER_SECOND && other == Type::FOOT_PER_SECOND)
+            return value / 30.48f;
+        else if (type == Type::CENTIMETER_PER_SECOND && other == Type::METER_PER_SECOND)
+            return value / 100.0f;
+        else if (type == Type::CENTIMETER_PER_SECOND && other == Type::KILOMETER_PER_HOUR)
+            return value / 27.778f;
+        else if (type == Type::CENTIMETER_PER_SECOND && other == Type::KNOTS)
+            return value / 51.444f;
+        else if (type == Type::CENTIMETER_PER_SECOND && other == Type::CENTIMETER_PER_SECOND)
+            return value;
+
+        else if (type == Type::METER_PER_SECOND && other == Type::MILLE_PER_HOUR)
+            return value * 2.237f;
+        else if (type == Type::METER_PER_SECOND && other == Type::CENTIMETER_PER_SECOND)
+            return value * 100.0f;
+        else if (type == Type::METER_PER_SECOND && other == Type::FOOT_PER_SECOND)
+            return value * 3.281f;
+        else if (type == Type::METER_PER_SECOND && other == Type::KILOMETER_PER_HOUR)
+            return value * 3.6f;
+        else if (type == Type::METER_PER_SECOND && other == Type::KNOTS)
+            return value * 1.94384f;
+        else if (type == Type::METER_PER_SECOND && other == Type::METER_PER_SECOND)
+            return value;
+
+        else if (type == Type::KILOMETER_PER_HOUR && other == Type::MILLE_PER_HOUR)
+            return value / 1.609f;
+        else if (type == Type::KILOMETER_PER_HOUR && other == Type::CENTIMETER_PER_SECOND)
+            return value * 27.778f;
+        else if (type == Type::KILOMETER_PER_HOUR && other == Type::FOOT_PER_SECOND)
+            return value / 1.097f;
+        else if (type == Type::KILOMETER_PER_HOUR && other == Type::METER_PER_SECOND)
+            return value / 3.6f;
+        else if (type == Type::KILOMETER_PER_HOUR && other == Type::KNOTS)
+            return value / 1.852f;
+        else if (type == Type::KILOMETER_PER_HOUR && other == Type::KILOMETER_PER_HOUR)
+            return value;
+
+        else if (type == Type::KNOTS && other == Type::MILLE_PER_HOUR)
+            return value * 1.151f;
+        else if (type == Type::KNOTS && other == Type::CENTIMETER_PER_SECOND)
+            return value * 51.444f;
+        else if (type == Type::KNOTS && other == Type::FOOT_PER_SECOND)
+            return value * 1.688f;
+        else if (type == Type::KNOTS && other == Type::METER_PER_SECOND)
+            return value / 1.944f;
+        else if (type == Type::KNOTS && other == Type::KILOMETER_PER_HOUR)
+            return value * 1.852f;
+        else if (type == Type::KNOTS && other == Type::KNOTS)
             return value;
 
         return std::nullopt;

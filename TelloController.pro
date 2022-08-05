@@ -18,7 +18,14 @@ SOURCES += \
     ./src/facedetector.cpp \
     ./src/waypointeditor.cpp \
     ./src/flightcontroller.cpp \
-    src/unit.cpp
+    ./src/unit.cpp \
+    ./src/telemetry.cpp \
+    ./src/artificialhorizon.cpp \
+    ./src/altimeter.cpp \
+    ./src/speedmeter.cpp \
+    ./src/gauge.cpp \
+    ./src/button.cpp \
+    ./src/crosshair.cpp
 
 HEADERS += \
     ./include/mainwindow.h \
@@ -30,7 +37,16 @@ HEADERS += \
     ./include/waypointeditor.h \
     ./include/flightcontroller.h \
     ./include/metric.h \
-    ./include/unit.h
+    ./include/unit.h \
+    ./include/telemetry.h \
+    ./include/artificialhorizon.h \
+    ./include/flightstate.h \
+    ./include/altimeter.h \
+    ./include/helper.h \
+    ./include/speedmeter.h \
+    ./include/gauge.h \
+    ./include/button.h \
+    ./include/crosshair.h
 
 FORMS += \
     mainwindow.ui
@@ -60,3 +76,14 @@ LIBS += -L$$PWD/3rdparty/opencv/lib \
     -lopencv_stitching460 \
     -lopencv_video460 \
     -lopencv_videoio460 \
+
+DEPENDPATH += $$PWD/3rdparty/ffmpeg/include
+INCLUDEPATH += $$PWD/3rdparty/ffmpeg/include
+LIBS += -L$$PWD/3rdparty/ffmpeg/lib \
+    -lavcodec \
+    -lavdevice\
+    -lavfilter \
+    -lavformat \
+    -lavutil \
+    -lswresample \
+    -lswscale \

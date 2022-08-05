@@ -8,6 +8,8 @@
 #include <QVector3D>
 #include <QVariant>
 
+#include "../include/flightstate.h"
+
 using namespace std::chrono;
 
 class NetworkController : public QObject
@@ -37,14 +39,21 @@ signals:
     void on_controller_acceleration(const QVector3D& vector);
     void on_controller_time_of_flight(float meters);
     void on_controller_wifi_snr(int ratio);
+    void on_controller_state(const FlightState& state);
+
 public slots:
     void ready_read();
+    void state_read();
 
 private:
     bool debug;
     QHostAddress address;
     quint16 port;
     QUdpSocket* socket;
+
+    QHostAddress state_address;
+    quint16 state_port;
+    QUdpSocket* state_socket;
 
     QString current_command;
     QString last_command;

@@ -1,100 +1,51 @@
-#include "../include/flightcontroller.h"
 #include "../include/networkcontroller.h"
+#include "../include/flightcontroller.h"
+#include "qapplication.h"
+#include "qcoreapplication.h"
 #include "qdebug.h"
+#include "qguiapplication.h"
 
 FlightController::FlightController(QObject *parent)
     : QObject{parent},
       mode(Mode::MANUAL),
       state(State::LANDED),
-      network_controller(nullptr)
+      network_controller(nullptr),
+      position(QVector4D(0.0f, 0.0f, 0.0f, 0.0f))
 {
-    Metric speed("speed", 200.0f);
-    speed.set_constraint(ConstraintType::GTE, 0.0f);
-    speed.set_constraint(ConstraintType::LTE, 100.0f);
-    speed.set_unit(Unit::Type::CENTIMETER);
-    set_metric(MetricName::SPEED, speed);
+    telemetry.create_metric("speed", QVector3D(0.0f, 0.0f, 0.0f), Unit::Type::CENTIMETER);
+    telemetry.create_metric("max_speed", 0.0f, Unit::Type::CENTIMETER);
+    telemetry.create_metric("height", 0.0f, Unit::Type::CENTIMETER);
+    telemetry.create_metric("tof", 0.0f, Unit::Type::CENTIMETER);
+    telemetry.create_metric("pressure", 0.0f, Unit::Type::MILLIBAR);
+    telemetry.create_metric("battery", 0, Unit::Type::PERCENT);
+    telemetry.create_metric("flight_duration", 0, Unit::Type::SECOND);
+    telemetry.create_metric("temperature",  QVector2D(0.0f, 0.0f), Unit::Type::CELCIUS);
+    telemetry.create_metric("wifi_signal", 0, Unit::Type::PERCENT);
+    telemetry.create_metric("angular_rate", QVector3D(0.0f, 0.0f, 0.0f), Unit::Type::DEGREES);
+    telemetry.create_metric("acceleration", QVector3D(0.0f, 0.0f, 0.0f), Unit::Type::NONE);
+    telemetry.create_metric("target", QVector3D(0.0f, 0.0f, 0.0f), Unit::Type::NONE);
 
-    Metric max_speed("max_speed", 0.0f);
-    max_speed.set_constraint(ConstraintType::GTE, 0.0f);
-    max_speed.set_constraint(ConstraintType::LTE, 100.0f);
-    max_speed.set_unit(Unit::Type::CENTIMETER);
-    set_metric(MetricName::MAX_SPEED, max_speed);
+    auto telemetry_path = qApp->applicationDirPath() + "/telemetry/";
+    const auto now = std::chrono::system_clock::now();
+    const auto timestamp = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+    telemetry.start_record(telemetry_path.toStdString() + std::to_string(timestamp) + ".csv");
+}
 
-    Metric height("height", 0.0f);
-    height.set_constraint(ConstraintType::GTE, 0.0f);
-    height.set_constraint(ConstraintType::LTE, 100.0f);
-    height.set_unit(Unit::Type::CENTIMETER);
-    set_metric(MetricName::HEIGHT, height);
-
-    Metric time_of_flight("time_of_flight", 0);
-    time_of_flight.set_constraint(ConstraintType::GTE, 0);
-    time_of_flight.set_constraint(ConstraintType::LTE, 100);
-    time_of_flight.set_unit(Unit::Type::SECOND);
-    set_metric(MetricName::TIME_OF_FLIGHT, time_of_flight);
-
-    Metric pressure("pressure", 1020.0f);
-    pressure.set_constraint(ConstraintType::GTE, 0.0f);
-    pressure.set_constraint(ConstraintType::LTE, 2000.0f);
-    pressure.set_unit(Unit::Type::MILLIBAR);
-    set_metric(MetricName::PRESSURE, pressure);
-
-    auto c = pressure.convert_to(Unit::Type::PSI);
-
-    if (c.has_value()) {
-        set_metric_value(MetricName::PRESSURE, c.value());
-        set_metric_unit(MetricName::PRESSURE, Unit::Type::PSI);
-        qDebug() << "pressure: " << pressure;
-    }
-
-    Metric battery("battery", 0);
-    battery.set_constraint(ConstraintType::GTE, 0);
-    battery.set_constraint(ConstraintType::LTE, 100);
-    battery.set_unit(Unit::Type::PERCENT);
-    set_metric(MetricName::BATTERY, battery);
-
-    Metric flight_duration("flight_duration", 0);
-    flight_duration.set_constraint(ConstraintType::GTE, 0);
-    flight_duration.set_constraint(ConstraintType::LTE, 100);
-    flight_duration.set_unit(Unit::Type::SECOND);
-    set_metric(MetricName::FLIGHT_DURATION, flight_duration);
-
-    Metric temperature("temperature", 0);
-    temperature.set_constraint(ConstraintType::GTE, 0);
-    temperature.set_constraint(ConstraintType::LTE, 100);
-    temperature.set_unit(Unit::Type::CELCIUS);
-    set_metric(MetricName::TEMPERATURE, temperature);
-
-    Metric wifi_signal("wifi_signal", 0);
-    wifi_signal.set_constraint(ConstraintType::GTE, 0);
-    wifi_signal.set_constraint(ConstraintType::LTE, 100);
-    wifi_signal.set_unit(Unit::Type::PERCENT);
-    set_metric(MetricName::WIFI_SIGNAL, wifi_signal);
-
-    Metric angular_rate("angular_rate", QVector3D(0.0f, 0.0f, 0.0f));
-    angular_rate.set_unit(Unit::Type::RADIANS);
-    set_metric(MetricName::ANGULAR_RATE, angular_rate);
-
-    Metric acceleration("acceleration", QVector3D(0.0f, 0.0f, 0.0f));
-    acceleration.set_unit(Unit::Type::CENTIMETER);
-    set_metric(MetricName::ACCELERATION, acceleration);
-
-    Metric target("target", QVector3D(0.0f, 0.0f, 0.0f));
-    set_metric(MetricName::TARGET, target);
-
-    print_metrics();
+FlightController::~FlightController()
+{
+    telemetry.stop_record();
 }
 
 void FlightController::update()
 {
-    auto target_metric = get_metric(MetricName::TARGET);
+    auto target = telemetry.get_metric<QVector3D>("target").value();
 
     // Follow target mode
     if (mode == Mode::FOLLOW
     && state == State::FLYING
     && network_controller
-    && target_metric.has_value())
+    && !target.isNull())
     {
-        auto target = target_metric.value().get_value<QVector3D>().value();
         auto now = std::chrono::system_clock::now();
         auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_command_time);
 
@@ -137,44 +88,32 @@ void FlightController::update()
     }
 }
 
-std::optional<Metric> FlightController::get_metric(MetricName name)
+void FlightController::set_network_controller(std::shared_ptr<NetworkController> controller)
 {
-    auto metric = metrics.find(name);
-
-    if (metric != metrics.end())
-       return metric->second;
-
-    return std::nullopt;
+    this->network_controller = controller;
+    connect(controller.get(), SIGNAL(on_controller_state(const FlightState&)), this, SLOT(on_flight_state(const FlightState&)));
 }
 
-void FlightController::set_metric(MetricName name, Metric& metric)
+void FlightController::estimate_position()
 {
-    metrics.insert(std::make_pair(name, metric));
+    auto angular_rate = telemetry.get_metric<QVector3D>("angular_rate").value();
+    auto acceleration = telemetry.get_metric<QVector3D>("acceleration").value();
 }
 
-void FlightController::set_metric_value(MetricName name, const std::any &value)
+void FlightController::on_flight_state(const FlightState& state)
 {
-    auto it = metrics.find(name);
+    telemetry.record(state);
 
-    if (it != metrics.end())
-        it->second.set_value(value);
-}
+    telemetry.set_metric_value("speed", state.speed);
+    telemetry.set_metric_value("height", state.height);
+    telemetry.set_metric_value("tof", state.tof);
+    telemetry.set_metric_value("pressure", state.barometer);
+    telemetry.set_metric_value("battery", state.battery);
+    telemetry.set_metric_value("flight_duration", state.flight_duration);
+    telemetry.set_metric_value("temperature", state.temperature);
+    telemetry.set_metric_value("angular_rate", state.imu);
+    telemetry.set_metric_value("acceleration", state.acceleration);
 
-void FlightController::set_metric_unit(MetricName name, Unit::Type unit)
-{
-    auto it = metrics.find(name);
-
-    if (it != metrics.end())
-        it->second.set_unit(unit);
-};
-
-void FlightController::print_metrics()
-{
-   auto debug = qDebug();
-   debug.noquote();
-
-   debug << "Metrics:\n";
-
-   for (auto& metric : metrics)
-       debug << metric.second << '\n';
+//    estimate_position();
+//    qDebug() << "Position: " << position;
 }

@@ -1,6 +1,7 @@
 #include "../include/unit.h"
 
 std::unordered_map<Unit::Type, const char*> Unit::symbols = {
+    {Type::NONE, ""},
     {Type::KELVIN, "K"},
     {Type::FAHRENHEIT, "°F"},
     {Type::CELCIUS, "°C"},
@@ -11,6 +12,12 @@ std::unordered_map<Unit::Type, const char*> Unit::symbols = {
     {Type::DECIMETER, "dm"},
     {Type::METER, "m"},
     {Type::KILOMETER, "km"},
+    {Type::MILLE_PER_HOUR, "mph"},
+    {Type::FOOT_PER_SECOND, "ft/s"},
+    {Type::CENTIMETER_PER_SECOND, "cm/s"},
+    {Type::METER_PER_SECOND, "m/s"},
+    {Type::KILOMETER_PER_HOUR, "km/h"},
+    {Type::KNOTS, "kt"},
     {Type::MILLISECOND, "ms"},
     {Type::SECOND, "s"},
     {Type::MINUTE, "m"},

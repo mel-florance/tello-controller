@@ -12,6 +12,26 @@
 
 #include "../include/unit.h"
 
+#define INT_TYPEID typeid(int)
+#define FLOAT_TYPEID typeid(float)
+#define DOUBLE_TYPEID typeid(double)
+#define VEC2_TYPEID typeid(QVector2D)
+#define VEC3_TYPEID typeid(QVector3D)
+#define VEC4_TYPEID typeid(QVector4D)
+
+inline bool operator < (const QVector2D& lhs, const QVector2D& rhs) {
+    return lhs.x() < rhs.x() && lhs.y() < rhs.y();
+}
+inline bool operator <= (const QVector2D& lhs, const QVector2D& rhs) {
+    return lhs.x() <= rhs.x() && lhs.y() <= rhs.y();
+}
+inline bool operator > (const QVector2D& lhs, const QVector2D& rhs) {
+    return lhs.x() > rhs.x() && lhs.y() > rhs.y();
+}
+inline bool operator >= (const QVector2D& lhs, const QVector2D& rhs) {
+    return lhs.x() >= rhs.x() && lhs.y() >= rhs.y();
+}
+
 inline bool operator < (const QVector3D& lhs, const QVector3D& rhs) {
     return lhs.x() < rhs.x() && lhs.y() < rhs.y() && lhs.z() < rhs.z();
 }
@@ -23,6 +43,19 @@ inline bool operator > (const QVector3D& lhs, const QVector3D& rhs) {
 }
 inline bool operator >= (const QVector3D& lhs, const QVector3D& rhs) {
     return lhs.x() >= rhs.x() && lhs.y() >= rhs.y() && lhs.z() >= rhs.z();
+}
+
+inline bool operator < (const QVector4D& lhs, const QVector4D& rhs) {
+    return lhs.x() < rhs.x() && lhs.y() < rhs.y() && lhs.z() < rhs.z() && lhs.w() < rhs.w();
+}
+inline bool operator <= (const QVector4D& lhs, const QVector4D& rhs) {
+    return lhs.x() <= rhs.x() && lhs.y() <= rhs.y() && lhs.z() <= rhs.z() && lhs.w() <= rhs.w();
+}
+inline bool operator > (const QVector4D& lhs, const QVector4D& rhs) {
+    return lhs.x() > rhs.x() && lhs.y() > rhs.y() && lhs.z() > rhs.z() && lhs.w() > rhs.w();
+}
+inline bool operator >= (const QVector4D& lhs, const QVector4D& rhs) {
+    return lhs.x() >= rhs.x() && lhs.y() >= rhs.y() && lhs.z() >= rhs.z() && lhs.w() >= rhs.w();
 }
 
 enum class ConstraintType {
@@ -101,13 +134,23 @@ public:
     inline operator QString() {
         QString str(name + ": ");
 
-        if (value.type() == typeid(int))
+        if (value.type() == INT_TYPEID)
             str += QString::number(get_value<int>(value).value()) + ' ' + unit.get_symbol();
-        else if (value.type() == typeid(float))
+        else if (value.type() == FLOAT_TYPEID)
             str += QString::number(get_value<float>(value).value()) + ' ' + unit.get_symbol();
-        else if (value.type() == typeid(QVector3D)) {
+        else if (value.type() == DOUBLE_TYPEID)
+            str += QString::number(get_value<double>(value).value()) + ' ' + unit.get_symbol();
+        else if (value.type() == VEC2_TYPEID) {
+            auto vec = get_value<QVector2D>(value).value();
+            str += QString("(%1, %2)").arg(vec.x()).arg(vec.y());
+        }
+        else if (value.type() == VEC3_TYPEID) {
             auto vec = get_value<QVector3D>(value).value();
             str += QString("(%1, %2, %3)").arg(vec.x()).arg(vec.y()).arg(vec.z());
+        }
+        else if (value.type() == VEC4_TYPEID) {
+            auto vec = get_value<QVector4D>(value).value();
+            str += QString("(%1, %2, %3, %4)").arg(vec.x()).arg(vec.y()).arg(vec.z()).arg(vec.w());
         }
 
         return str;
@@ -123,109 +166,199 @@ public:
         for (auto it = constraints.begin(); it != constraints.end(); ++it) {
             switch (it->first) {
             case ConstraintType::EQ: {
-                if (it->second.type() == typeid(int) && v.type() == typeid(int)) {
+                if (it->second.type() == INT_TYPEID && v.type() == INT_TYPEID) {
                     auto v1 = get_value<int>(v);
                     auto v2 = get_value<int>(it->second);
                     if (v1 == v2) ++passed;
                 }
-                if (it->second.type() == typeid(float) && v.type() == typeid(float)) {
+                if (it->second.type() == FLOAT_TYPEID && v.type() == FLOAT_TYPEID) {
                     auto v1 = get_value<float>(v);
                     auto v2 = get_value<float>(it->second);
                     if (v1 == v2) ++passed;
                 }
-                if (it->second.type() == typeid(QVector3D) && v.type() == typeid(QVector3D)) {
+                if (it->second.type() == DOUBLE_TYPEID && v.type() == DOUBLE_TYPEID) {
+                    auto v1 = get_value<double>(v);
+                    auto v2 = get_value<double>(it->second);
+                    if (v1 == v2) ++passed;
+                }
+                if (it->second.type() == VEC2_TYPEID && v.type() == VEC2_TYPEID) {
+                    auto v1 = get_value<QVector2D>(v);
+                    auto v2 = get_value<QVector2D>(it->second);
+                    if (v1 == v2) ++passed;
+                }
+                if (it->second.type() == VEC3_TYPEID && v.type() == VEC3_TYPEID) {
                     auto v1 = get_value<QVector3D>(v);
                     auto v2 = get_value<QVector3D>(it->second);
+                    if (v1 == v2) ++passed;
+                }
+                if (it->second.type() == VEC4_TYPEID && v.type() == VEC4_TYPEID) {
+                    auto v1 = get_value<QVector4D>(v);
+                    auto v2 = get_value<QVector4D>(it->second);
                     if (v1 == v2) ++passed;
                 }
                 break;
             }
             case ConstraintType::NEQ: {
-                if (it->second.type() == typeid(int) && v.type() == typeid(int)) {
+                if (it->second.type() == INT_TYPEID && v.type() == INT_TYPEID) {
                     auto v1 = get_value<int>(v);
                     auto v2 = get_value<int>(it->second);
                     if (v1 != v2) ++passed;
                 }
-                if (it->second.type() == typeid(float) && v.type() == typeid(float)) {
+                if (it->second.type() == FLOAT_TYPEID && v.type() == FLOAT_TYPEID) {
                     auto v1 = get_value<float>(v);
                     auto v2 = get_value<float>(it->second);
                     if (v1 != v2) ++passed;
                 }
-                if (it->second.type() == typeid(QVector3D) && v.type() == typeid(QVector3D)) {
+                if (it->second.type() == DOUBLE_TYPEID && v.type() == DOUBLE_TYPEID) {
+                    auto v1 = get_value<double>(v);
+                    auto v2 = get_value<double>(it->second);
+                    if (v1 != v2) ++passed;
+                }
+                if (it->second.type() == VEC2_TYPEID && v.type() == VEC2_TYPEID) {
+                    auto v1 = get_value<QVector2D>(v);
+                    auto v2 = get_value<QVector2D>(it->second);
+                    if (v1 != v2) ++passed;
+                }
+                if (it->second.type() == VEC3_TYPEID && v.type() == VEC3_TYPEID) {
                     auto v1 = get_value<QVector3D>(v);
                     auto v2 = get_value<QVector3D>(it->second);
+                    if (v1 != v2) ++passed;
+                }
+                if (it->second.type() == VEC4_TYPEID && v.type() == VEC4_TYPEID) {
+                    auto v1 = get_value<QVector4D>(v);
+                    auto v2 = get_value<QVector4D>(it->second);
                     if (v1 != v2) ++passed;
                 }
                 break;
             }
             case ConstraintType::LT: {
-                if (it->second.type() == typeid(int) && v.type() == typeid(int)) {
+                if (it->second.type() == INT_TYPEID && v.type() == INT_TYPEID) {
                     auto v1 = get_value<int>(v);
                     auto v2 = get_value<int>(it->second);
                     if (v1 < v2) ++passed;
                 }
-                if (it->second.type() == typeid(float) && v.type() == typeid(float)) {
+                if (it->second.type() == FLOAT_TYPEID && v.type() == FLOAT_TYPEID) {
                     auto v1 = get_value<float>(v);
                     auto v2 = get_value<float>(it->second);
                     if (v1 < v2) ++passed;
                 }
-                if (it->second.type() == typeid(QVector3D) && v.type() == typeid(QVector3D)) {
+                if (it->second.type() == DOUBLE_TYPEID && v.type() == DOUBLE_TYPEID) {
+                    auto v1 = get_value<double>(v);
+                    auto v2 = get_value<double>(it->second);
+                    if (v1 < v2) ++passed;
+                }
+                if (it->second.type() == VEC2_TYPEID && v.type() == VEC2_TYPEID) {
+                    auto v1 = get_value<QVector2D>(v);
+                    auto v2 = get_value<QVector2D>(it->second);
+                    if (v1 < v2) ++passed;
+                }
+                if (it->second.type() == VEC3_TYPEID && v.type() == VEC3_TYPEID) {
                     auto v1 = get_value<QVector3D>(v);
                     auto v2 = get_value<QVector3D>(it->second);
+                    if (v1 < v2) ++passed;
+                }
+                if (it->second.type() == VEC4_TYPEID && v.type() == VEC4_TYPEID) {
+                    auto v1 = get_value<QVector4D>(v);
+                    auto v2 = get_value<QVector4D>(it->second);
                     if (v1 < v2) ++passed;
                 }
                 break;
             }
             case ConstraintType::LTE: {
-                if (it->second.type() == typeid(int) && v.type() == typeid(int)) {
+                if (it->second.type() == INT_TYPEID && v.type() == INT_TYPEID) {
                     auto v1 = get_value<int>(v);
                     auto v2 = get_value<int>(it->second);
                     if (v1 <= v2) ++passed;
                 }
-                if (it->second.type() == typeid(float) && v.type() == typeid(float)) {
+                if (it->second.type() == FLOAT_TYPEID && v.type() == FLOAT_TYPEID) {
                     auto v1 = get_value<float>(v);
                     auto v2 = get_value<float>(it->second);
                     if (v1 <= v2) ++passed;
                 }
-                if (it->second.type() == typeid(QVector3D) && v.type() == typeid(QVector3D)) {
+                if (it->second.type() == DOUBLE_TYPEID && v.type() == DOUBLE_TYPEID) {
+                    auto v1 = get_value<double>(v);
+                    auto v2 = get_value<double>(it->second);
+                    if (v1 <= v2) ++passed;
+                }
+                if (it->second.type() == VEC2_TYPEID && v.type() == VEC2_TYPEID) {
+                    auto v1 = get_value<QVector2D>(v);
+                    auto v2 = get_value<QVector2D>(it->second);
+                    if (v1 <= v2) ++passed;
+                }
+                if (it->second.type() == VEC3_TYPEID && v.type() == VEC3_TYPEID) {
                     auto v1 = get_value<QVector3D>(v);
                     auto v2 = get_value<QVector3D>(it->second);
+                    if (v1 <= v2) ++passed;
+                }
+                if (it->second.type() == VEC4_TYPEID && v.type() == VEC4_TYPEID) {
+                    auto v1 = get_value<QVector4D>(v);
+                    auto v2 = get_value<QVector4D>(it->second);
                     if (v1 <= v2) ++passed;
                 }
                 break;
             }
             case ConstraintType::GT: {
-                if (it->second.type() == typeid(int) && v.type() == typeid(int)) {
+                if (it->second.type() == INT_TYPEID && v.type() == INT_TYPEID) {
                     auto v1 = get_value<int>(v);
                     auto v2 = get_value<int>(it->second);
                     if (v1 > v2) ++passed;
                 }
-                if (it->second.type() == typeid(float) && v.type() == typeid(float)) {
+                if (it->second.type() == FLOAT_TYPEID && v.type() == FLOAT_TYPEID) {
                     auto v1 = get_value<float>(v);
                     auto v2 = get_value<float>(it->second);
                     if (v1 > v2) ++passed;
                 }
-                if (it->second.type() == typeid(QVector3D) && v.type() == typeid(QVector3D)) {
+                if (it->second.type() == DOUBLE_TYPEID && v.type() == DOUBLE_TYPEID) {
+                    auto v1 = get_value<double>(v);
+                    auto v2 = get_value<double>(it->second);
+                    if (v1 > v2) ++passed;
+                }
+                if (it->second.type() == VEC2_TYPEID && v.type() == VEC2_TYPEID) {
+                    auto v1 = get_value<QVector2D>(v);
+                    auto v2 = get_value<QVector2D>(it->second);
+                    if (v1 > v2) ++passed;
+                }
+                if (it->second.type() == VEC3_TYPEID && v.type() == VEC3_TYPEID) {
                     auto v1 = get_value<QVector3D>(v);
                     auto v2 = get_value<QVector3D>(it->second);
+                    if (v1 > v2) ++passed;
+                }
+                if (it->second.type() == VEC4_TYPEID && v.type() == VEC4_TYPEID) {
+                    auto v1 = get_value<QVector4D>(v);
+                    auto v2 = get_value<QVector4D>(it->second);
                     if (v1 > v2) ++passed;
                 }
                 break;
             }
             case ConstraintType::GTE: {
-                if (it->second.type() == typeid(int) && v.type() == typeid(int)) {
+                if (it->second.type() == INT_TYPEID && v.type() == INT_TYPEID) {
                     auto v1 = get_value<int>(v);
                     auto v2 = get_value<int>(it->second);
                     if (v1 >= v2) ++passed;
                 }
-                if (it->second.type() == typeid(float) && v.type() == typeid(float)) {
+                if (it->second.type() == FLOAT_TYPEID && v.type() == FLOAT_TYPEID) {
                     auto v1 = get_value<float>(v);
                     auto v2 = get_value<float>(it->second);
                     if (v1 >= v2) ++passed;
                 }
-                if (it->second.type() == typeid(QVector3D) && v.type() == typeid(QVector3D)) {
+                if (it->second.type() == DOUBLE_TYPEID && v.type() == DOUBLE_TYPEID) {
+                    auto v1 = get_value<double>(v);
+                    auto v2 = get_value<double>(it->second);
+                    if (v1 >= v2) ++passed;
+                }
+                if (it->second.type() == VEC2_TYPEID && v.type() == VEC2_TYPEID) {
+                    auto v1 = get_value<QVector2D>(v);
+                    auto v2 = get_value<QVector2D>(it->second);
+                    if (v1 >= v2) ++passed;
+                }
+                if (it->second.type() == VEC3_TYPEID && v.type() == VEC3_TYPEID) {
                     auto v1 = get_value<QVector3D>(v);
                     auto v2 = get_value<QVector3D>(it->second);
+                    if (v1 >= v2) ++passed;
+                }
+                if (it->second.type() == VEC4_TYPEID && v.type() == VEC4_TYPEID) {
+                    auto v1 = get_value<QVector4D>(v);
+                    auto v2 = get_value<QVector4D>(it->second);
                     if (v1 >= v2) ++passed;
                 }
                 break;
@@ -240,9 +373,10 @@ public:
         unit.type = type;
     }
 
-    inline std::optional<float> convert_to(Unit::Type type) {
-        if (value.type() == typeid(int) || value.type() == typeid(float))
-            return unit.to(type, get_value<float>(value).value());
+    template<typename T>
+    inline std::optional<T> convert_to(Unit::Type type) {
+        if (value.type() == INT_TYPEID || value.type() == FLOAT_TYPEID || value.type() == DOUBLE_TYPEID)
+            return unit.to(type, get_value<T>(value).value());
 
         return std::nullopt;
     };

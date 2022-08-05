@@ -18,6 +18,12 @@
 #include "../include/videoreader.h"
 #include "../include/videorecorder.h"
 #include "../include/waypointeditor.h"
+#include "../include/artificialhorizon.h"
+#include "../include/altimeter.h"
+#include "../include/speedmeter.h"
+#include "../include/crosshair.h"
+#include "../include/gauge.h"
+#include "../include/button.h"
 
 #include <opencv2/core/core.hpp>
 
@@ -66,6 +72,7 @@ private slots:
 
     void on_connected();
     void on_battery(int percent);
+    void on_speed(float value);
     void on_maxspeed(float value);
     void on_flighttime(int seconds);
     void on_height(int centimeters);
@@ -81,6 +88,7 @@ private slots:
     void on_recordtimer();
     void on_alerttimer();
     void on_faceoffset(QVector3D& offset);
+    void on_flightstate(const FlightState& state);
 
     void on_button_start_recording_clicked();
     void on_splitter_splitterMoved(int pos, int index);
@@ -115,6 +123,24 @@ private:
     std::unique_ptr<QTimer> alert_timer;
     QVector<QListWidgetItem*> waypoints;
     std::unique_ptr<WaypointEditor> waypoint_editor;
+    std::unique_ptr<ArtificialHorizon> artificial_horizon;
+    std::unique_ptr<Altimeter> altimeter;
+    std::unique_ptr<SpeedMeter> speedmeter;
+    std::unique_ptr<Crosshair> crosshair;
+    std::unique_ptr<Gauge> temperature_gauge;
+    std::unique_ptr<Gauge> battery_gauge;
+    std::unique_ptr<Gauge> pressure_gauge;
+    std::unique_ptr<Gauge> wifi_gauge;
+    std::unique_ptr<Button> landing_button;
+    std::unique_ptr<Button> power_button;
+    std::unique_ptr<Button> signal_button;
+    std::unique_ptr<Button> temp_button;
+    std::unique_ptr<Button> pressure_button;
+    std::unique_ptr<Button> inair_button;
+    std::unique_ptr<Button> height_button;
+    std::unique_ptr<Button> recording_button;
+    std::unique_ptr<Button> auto_pilot_button;
+    std::unique_ptr<Button> lighting_button;
     bool is_connected;
     bool is_video_started;
     bool is_flying;

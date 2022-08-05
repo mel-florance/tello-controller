@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
       wifi_progress_bar(nullptr),
       network_controller(nullptr),
       flight_controller(nullptr),
+      artificial_horizon(nullptr),
+      altimeter(nullptr),
       is_connected(false),
       is_video_started(false),
       is_flying(false),
@@ -37,6 +39,68 @@ MainWindow::MainWindow(QWidget *parent)
     pxr.fill(Qt::black);
     ui->video->setPixmap(pxr);
     ui->video->setAlignment(Qt::AlignCenter);
+
+    artificial_horizon = std::make_unique<ArtificialHorizon>(ui->video);
+    artificial_horizon->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    artificial_horizon->resize(302, 302);
+
+    altimeter = std::make_unique<Altimeter>(ui->video);
+    altimeter->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    altimeter->resize(302, 302);
+
+    speedmeter = std::make_unique<SpeedMeter>(ui->video);
+    speedmeter->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    speedmeter->resize(302, 302);
+
+    crosshair = std::make_unique<Crosshair>(ui->video);
+    crosshair->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    crosshair->resize(302, 302);
+
+    temperature_gauge = std::make_unique<Gauge>(ui->video);
+    temperature_gauge->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    temperature_gauge->resize(100, 100);
+    temperature_gauge->setWidth(100.0);
+    temperature_gauge->setHeight(100.0);
+    temperature_gauge->setMax(95.0);
+    temperature_gauge->setUnit(Unit::Type::CELCIUS);
+    temperature_gauge->setName("TEMP.");
+
+    battery_gauge = std::make_unique<Gauge>(ui->video);
+    battery_gauge->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    battery_gauge->resize(100, 100);
+    battery_gauge->setWidth(100.0);
+    battery_gauge->setHeight(100.0);
+    battery_gauge->setUnit(Unit::Type::PERCENT);
+    battery_gauge->setName("BATTERY");
+
+    pressure_gauge = std::make_unique<Gauge>(ui->video);
+    pressure_gauge->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    pressure_gauge->resize(100, 100);
+    pressure_gauge->setUnit(Unit::Type::MILLIBAR);
+    pressure_gauge->setName("PRESSURE");
+    pressure_gauge->setWidth(100.0);
+    pressure_gauge->setHeight(100.0);
+    pressure_gauge->setMin(100.0);
+    pressure_gauge->setMax(1050.0);
+
+    wifi_gauge = std::make_unique<Gauge>(ui->video);
+    wifi_gauge->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    wifi_gauge->resize(100, 100);
+    wifi_gauge->setUnit(Unit::Type::PERCENT);
+    wifi_gauge->setName("WIFI");
+    wifi_gauge->setWidth(100.0);
+    wifi_gauge->setHeight(100.0);
+
+    landing_button = std::make_unique<Button>(ui->video, "LANDING");
+    power_button = std::make_unique<Button>(ui->video, "POWER");
+    signal_button = std::make_unique<Button>(ui->video, "SIGNAL");
+    temp_button = std::make_unique<Button>(ui->video, "TEMP.");
+    pressure_button = std::make_unique<Button>(ui->video, "PRESSURE");
+    inair_button = std::make_unique<Button>(ui->video, "IN AIR");
+    height_button = std::make_unique<Button>(ui->video, "HEIGHT");
+    recording_button = std::make_unique<Button>(ui->video, "RECORDING");
+    auto_pilot_button = std::make_unique<Button>(ui->video, "AUTO-PILOT");
+    lighting_button = std::make_unique<Button>(ui->video, "LIGHTING");
 
     video_recorder = new VideoRecorder();
     auto waypoint_editor_ptr = new WaypointEditor();
@@ -75,6 +139,7 @@ MainWindow::MainWindow(QWidget *parent)
     temperature_progress_bar_ptr->setFormat("Temperature (0°C)");
     ui->statusbar->addPermanentWidget(temperature_progress_bar_ptr, 2);
     temperature_progress_bar.reset(temperature_progress_bar_ptr);
+
 }
 
 MainWindow::~MainWindow()
@@ -109,7 +174,7 @@ void MainWindow::on_button_connect_clicked()
     else {
         auto address = ui->input_ip->text();
         auto port = ui->input_port->text();
-
+       landing_button->startAlerting();
         auto ptr = new NetworkController(this, QHostAddress(address), port.toUShort());
         connect(ptr, SIGNAL(on_controller_ready()), this, SLOT(on_connected()));
         connect(ptr, SIGNAL(on_controller_max_speed(float)), this, SLOT(on_maxspeed(float)));
@@ -122,6 +187,7 @@ void MainWindow::on_button_connect_clicked()
         connect(ptr, SIGNAL(on_controller_acceleration(const QVector3D&)), this, SLOT(on_acceleration(const QVector3D&)));
         connect(ptr, SIGNAL(on_controller_time_of_flight(float)), this, SLOT(on_timeofflight(float)));
         connect(ptr, SIGNAL(on_controller_wifi_snr(int)), this, SLOT(on_wifisnr(int)));
+        connect(ptr, SIGNAL(on_controller_state(const FlightState&)), this, SLOT(on_flightstate(const FlightState&)));
         network_controller.reset(ptr);
         network_controller->init();
         flight_controller->set_network_controller(network_controller);
@@ -149,7 +215,7 @@ void MainWindow::on_connected()
     auto ptr = new QTimer(this);
     connect(ptr, SIGNAL(timeout()), this, SLOT(on_pollinfos()));
     poll_infos_timer.reset(ptr);
-    poll_infos_timer->start(2500);
+    //poll_infos_timer->start(2500);
 }
 
 void MainWindow::on_battery(int percent)
@@ -170,8 +236,12 @@ void MainWindow::on_battery(int percent)
     battery_progress_bar->setFormat("Battery (" + QString::number(percent) + " %)");
 }
 
-void MainWindow::on_maxspeed(float value) {
+void MainWindow::on_speed(float value) {
     ui->drone_speed->setText(QString::number(value) + " cm /s");
+}
+
+void MainWindow::on_maxspeed(float value) {
+    ui->drone_max_speed->setText(QString::number(value) + " cm /s");
 }
 
 void MainWindow::on_flighttime(int seconds) {
@@ -215,6 +285,8 @@ void MainWindow::on_timeofflight(float meters) {
 void MainWindow::on_wifisnr(int ratio) {
     wifi_progress_bar->setValue(ratio);
     wifi_progress_bar->setFormat("Wifi (" + QString::number(ratio) + " %)");
+    wifi_gauge->setValue((double)ratio);
+    wifi_gauge->repaint();
 }
 
 void MainWindow::on_pollinfos()
@@ -343,6 +415,45 @@ void MainWindow::resize_ui_elements()
         350,
         140
     });
+
+    if (artificial_horizon)
+        artificial_horizon->move(ui->tabWidget->geometry().width() * 0.5f - 150.0f, ui->tabWidget->geometry().height() - 300.0f);
+    if (altimeter)
+        altimeter->move(ui->tabWidget->geometry().width() * 0.5f - 300.0f, ui->tabWidget->geometry().height() * 0.5f - 180.0f);
+    if (speedmeter)
+        speedmeter->move(ui->tabWidget->geometry().width() * 0.5f + 232.0f, ui->tabWidget->geometry().height() * 0.5f - 180.0f);
+    if (crosshair)
+        crosshair->move(ui->tabWidget->geometry().width() * 0.5f - 150.0f, ui->tabWidget->geometry().height() * 0.5f - 180.0f);
+    if (temperature_gauge)
+        temperature_gauge->move(artificial_horizon->geometry().x() - 60.0f, artificial_horizon->geometry().y() + 140.0f);
+    if (battery_gauge)
+        battery_gauge->move(artificial_horizon->geometry().x() + 260.0f, artificial_horizon->geometry().y() + 140.0f);
+    if (pressure_gauge)
+        pressure_gauge->move(artificial_horizon->geometry().x() - 60.0f, artificial_horizon->geometry().y() + 30.0f);
+    if (wifi_gauge)
+        wifi_gauge->move(artificial_horizon->geometry().x() + 260.0f, artificial_horizon->geometry().y() + 30.0f);
+    if (landing_button)
+        landing_button->move(artificial_horizon->geometry().x() - 150.0f, artificial_horizon->geometry().y() + 40.0f);
+    if (power_button)
+        power_button->move(artificial_horizon->geometry().x() - 150.0f, artificial_horizon->geometry().y() + 80.0f);
+    if (signal_button)
+        signal_button->move(artificial_horizon->geometry().x() - 150.0f, artificial_horizon->geometry().y() + 120.0f);
+    if (temp_button)
+        temp_button->move(artificial_horizon->geometry().x() - 150.0f, artificial_horizon->geometry().y() + 160.0f);
+    if (pressure_button)
+        pressure_button->move(artificial_horizon->geometry().x() - 150.0f, artificial_horizon->geometry().y() + 200.0f);
+    if (inair_button)
+        inair_button->move(artificial_horizon->geometry().x() + 370.0f, artificial_horizon->geometry().y() + 40.0f);
+    if (height_button)
+        height_button->move(artificial_horizon->geometry().x() + 370.0f, artificial_horizon->geometry().y() + 80.0f);
+    if (recording_button)
+        recording_button->move(artificial_horizon->geometry().x() + 370.0f, artificial_horizon->geometry().y() + 120.0f);
+    if (auto_pilot_button)
+        auto_pilot_button->move(artificial_horizon->geometry().x() + 370.0f, artificial_horizon->geometry().y() + 160.0f);
+    if (lighting_button)
+        lighting_button->move(artificial_horizon->geometry().x() + 370.0f, artificial_horizon->geometry().y() + 200.0f);
+
+    ui->video->repaint();
 }
 
 void MainWindow::on_button_takeoff_clicked()
@@ -599,7 +710,6 @@ void MainWindow::on_face_detection_radio_clicked()
     edge_detector->enabled = false;
 }
 
-
 void MainWindow::on_recordtimer()
 {
     ui->recording_dot->setVisible(!ui->recording_dot->isVisible());
@@ -613,8 +723,43 @@ void MainWindow::on_alerttimer()
 void MainWindow::on_faceoffset(QVector3D &offset)
 {
     if (!follow_target) return;
-    flight_controller->set_metric_value(FlightController::MetricName::TARGET, offset);
+    flight_controller->telemetry.set_metric_value("target", offset);
     flight_controller->update();
+}
+
+void MainWindow::on_flightstate(const FlightState &state)
+{
+    on_barometer(state.barometer);
+    on_acceleration(state.acceleration);
+    on_battery(state.battery);
+    on_imu(state.imu);
+    on_height(state.height);
+    on_temperature(state.temperature.x());
+    on_flighttime(state.flight_duration);
+    on_timeofflight(state.tof);
+    on_speed(state.speed.length());
+
+    artificial_horizon->set_yaw_angle(state.imu.x());
+    artificial_horizon->set_pitch_angle(-state.imu.y());
+    artificial_horizon->set_roll_angle(-state.imu.z());
+    artificial_horizon->repaint();
+
+    altimeter->setAltitude((double)state.height / 100.0);
+    altimeter->repaint();
+
+    speedmeter->setSpeed((double)state.speed.length() / 100.0);
+    speedmeter->repaint();
+
+    temperature_gauge->setValue((double)state.temperature.x());
+    temperature_gauge->repaint();
+
+    battery_gauge->setValue((double)state.battery);
+    battery_gauge->repaint();
+
+    pressure_gauge->setValue((double)state.barometer);
+    pressure_gauge->repaint();
+
+    ui->video->repaint();
 }
 
 void MainWindow::on_button_start_recording_clicked()

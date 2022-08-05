@@ -1,18 +1,25 @@
 #include "../include/networkcontroller.h"
 
 NetworkController::NetworkController(
-        QObject *parent,
-        const QHostAddress& address,
-        quint16 port) :
+    QObject *parent,
+    const QHostAddress& address,
+    quint16 port
+) :
     QObject{parent},
     debug(true),
     address(address),
     port(port),
+    state_address(QHostAddress("0.0.0.0")),
+    state_port(8890),
     commands({})
 {
     socket = new QUdpSocket(this);
     socket->bind(address, port);
     connect(socket, SIGNAL(readyRead()), this, SLOT(ready_read()));
+
+    state_socket = new QUdpSocket(this);
+    state_socket->bind(state_address, state_port);
+    connect(state_socket, SIGNAL(readyRead()), this, SLOT(state_read()));
 }
 
 void NetworkController::send(const QByteArray& data)
@@ -143,4 +150,68 @@ void NetworkController::ready_read()
     }
 
     last_buffer = buffer;
+}
+
+void NetworkController::state_read()
+{
+    QHostAddress sender;
+    quint16 sender_port;
+    QByteArray buffer;
+
+    buffer.resize(state_socket->pendingDatagramSize());
+    state_socket->readDatagram(buffer.data(), buffer.size(), &sender, &sender_port);
+
+    if (debug) {
+        //qDebug() << "State received: " << buffer;
+    }
+
+    // pitch:82;roll:-38;yaw:48;vgx:0;vgy:0;vgz:0;templ:93;temph:94;tof:10;h:0;bat:84;baro:143.70;time:0;agx:942.00;agy:66.00;agz:-123.00;\r\n
+
+    auto parts = buffer.mid(0, buffer.size() - 2).split(';');
+    FlightState state;
+
+    for (auto& part : parts) {
+        auto metric = part.split(':');
+
+        if (metric.size() != 2)
+            continue;
+
+        auto name = metric.at(0);
+        auto value = metric.at(1);
+
+        if (name == "yaw")
+            state.imu.setX(value.toFloat());
+        else if (name == "pitch")
+            state.imu.setY(value.toFloat());
+        else if (name == "roll")
+            state.imu.setZ(value.toFloat());
+        else if (name == "vgx")
+            state.speed.setX(value.toFloat());
+        else if (name == "vgy")
+            state.speed.setY(value.toFloat());
+        else if (name == "vgz")
+            state.speed.setZ(value.toFloat());
+        else if (name == "templ")
+            state.temperature.setX(value.toInt());
+        else if (name == "temph")
+            state.temperature.setX(value.toInt());
+        else if (name == "tof")
+            state.tof = value.toInt();
+        else if (name == "h")
+            state.height = value.toFloat();
+        else if (name == "bat")
+            state.battery = value.toInt();
+        else if (name == "baro")
+            state.barometer = value.toFloat();
+        else if (name == "time")
+            state.flight_duration = value.toInt();
+        else if (name == "agx")
+            state.acceleration.setX(value.toFloat());
+        else if (name == "agz")
+            state.acceleration.setY(value.toFloat());
+        else if (name == "agz")
+            state.acceleration.setZ(value.toFloat());
+    }
+
+    emit on_controller_state(state);
 }
