@@ -9,7 +9,7 @@ Gauge::Gauge(QWidget *parent)
       max(100.0),
       color({255, 255, 255, 127}),
       unit(Unit::Type::NONE),
-      alerting(true)
+      alerting(false)
 {
 }
 

@@ -21,33 +21,33 @@ void VideoReader::process()
     cv::VideoCapture capture("udp://@0.0.0.0:11111", cv::CAP_FFMPEG);
     capture.set(cv::CAP_PROP_BUFFERSIZE, 1);
 
-    VideoReaderState vr_state;
+//    VideoReaderState vr_state;
 
-    if (!open(&vr_state, "G:/Code/TelloController/release/data/live.mp4")) {
-      qDebug() << "Couldn't open video file (make sure you set a video file that exists)";
-    }
+//    if (!open(&vr_state, "G:/Code/TelloController/release/data/live.mp4")) {
+//      qDebug() << "Couldn't open video file (make sure you set a video file that exists)";
+//    }
 
-    AVFrame* frame = av_frame_alloc();
-    constexpr int ALIGNMENT = 128;
+//    AVFrame* frame = av_frame_alloc();
+//    constexpr int ALIGNMENT = 128;
 
     while (running) {
-//        capture >> decoded;
+        capture >> decoded;
 
-//        if(decoded.empty()) {
-//            continue;
-//        }
-
-//        emit decoded_frame(decoded);
-
-        int64_t pts;
-        if (!read_frame(&vr_state, (uint8_t*)frame->data, &pts)) {
-           printf("Couldn't load video frame\n");
-           continue;
+        if(decoded.empty()) {
+            continue;
         }
 
-        QImage img(QSize(960, 720), QImage::Format_RGB32);
-        for (int y = 0; y < img.height(); y++)
-            memcpy(img.scanLine(y), frame->data[y], img.bytesPerLine());
+        emit decoded_frame(decoded);
+
+//        int64_t pts;
+//        if (!read_frame(&vr_state, (uint8_t*)frame->data, &pts)) {
+//           printf("Couldn't load video frame\n");
+//           continue;
+//        }
+
+//        QImage img(QSize(960, 720), QImage::Format_RGB32);
+//        for (int y = 0; y < img.height(); y++)
+//            memcpy(img.scanLine(y), frame->data[y], img.bytesPerLine());
     }
 
 }

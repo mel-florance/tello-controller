@@ -16,7 +16,7 @@ void SpeedMeter::paintEvent(QPaintEvent *event)
 
     painter.drawLine(x + 10.0, 0, x + 10.0, 280);
 
-    for (int i = 0; i <= 280; i += 30)
+    for (int i = 0; i <= 280; i += 28)
         painter.drawLine(x + 2, i, x + 9, i);
 
     auto y = Helper::map_value(speed, {0.0, 1.0}, {280.0, 0.0});

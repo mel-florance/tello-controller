@@ -14,7 +14,7 @@ void Altimeter::paintEvent(QPaintEvent *event)
     painter.setPen(QPen(color, 1, Qt::SolidLine));
     painter.drawLine(0, 0, 0, 280);
 
-    for (int i = 0; i <= 280; i += 30)
+    for (int i = 0; i <= 280; i += 28)
         painter.drawLine(2, i, 10, i);
 
     auto y = Helper::map_value(altitude, {0.0, 20.0}, {280, 0.0});
